@@ -5,10 +5,11 @@ import base.ecs32.top.api.dto.UserRegisterRequest;
 import base.ecs32.top.api.vo.UserLoginVO;
 import base.ecs32.top.api.vo.UserProfileVO;
 import base.ecs32.top.api.vo.UserRegisterVO;
+import base.ecs32.top.entity.User;
+import com.baomidou.mybatisplus.extension.service.IService;
 
-public interface UserService {
+public interface UserService extends IService<User> {
     UserRegisterVO register(UserRegisterRequest request);
-    UserLoginVO login(UserLoginRequest request);
+    UserLoginVO login(UserLoginRequest request, String ip);
     UserProfileVO getProfile(Long userId);
-    void logout(String token);
 }

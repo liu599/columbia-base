@@ -17,4 +17,6 @@ public class Product {
     private String description;
 
     private Integer baseCredits;
+
+    private Integer status;
 }

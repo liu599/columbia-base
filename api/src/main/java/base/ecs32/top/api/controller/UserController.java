@@ -31,8 +31,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserLoginVO login(@RequestBody UserLoginRequest request) {
-        return userService.login(request);
+    public UserLoginVO login(@RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
+        return userService.login(request, httpServletRequest.getRemoteAddr());
     }
 
     @PostMapping("/profile")
@@ -41,15 +41,7 @@ public class UserController {
         return userService.getProfile(userId);
     }
 
-    @PostMapping("/logout")
-    public String logout(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            userService.logout(token);
-        }
-        return "success";
-    }
+
 
     @GetMapping("/health")
     public String health() {

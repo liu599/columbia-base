@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class UserLoginVO {
-    private String userId;
+    private Long userId;
     private String token;
     private LocalDateTime expireTime;
     private String username;

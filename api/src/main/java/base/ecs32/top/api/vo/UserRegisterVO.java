@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRegisterVO {
-    private String userId;
+    private Long userId;
+    private String username;
 }

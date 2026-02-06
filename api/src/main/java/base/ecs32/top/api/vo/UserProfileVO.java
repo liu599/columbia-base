@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class UserProfileVO {
-    private String id;
+    private Long id;
     private String username;
     private String phone;
     private String wechatOpenid;

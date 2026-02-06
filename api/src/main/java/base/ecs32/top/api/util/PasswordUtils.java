@@ -39,4 +39,8 @@ public class PasswordUtils {
         }
         return hexString.toString();
     }
+
+    public static boolean checkPassword(String password, String hashedPassword) {
+        return hashPassword(password).equals(hashedPassword);
+    }
 }

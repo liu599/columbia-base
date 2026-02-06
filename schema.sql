@@ -35,6 +35,7 @@ CREATE TABLE `t_product`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '产品名，如：高中数学审阅 Agent',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '描述',
   `base_credits` int(11) NULL DEFAULT NULL COMMENT '激活该产品赠送的初始积分，可选',
+  `status` int(11) NULL DEFAULT 1 COMMENT '1: 启用, 0: 下架/隐藏',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
@@ -78,4 +79,24 @@ CREATE TABLE `t_activation_code`  (
   `used_time` datetime(0) NULL DEFAULT NULL COMMENT '核销时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_code`(`code`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for t_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_audit_log`;
+CREATE TABLE `t_audit_log`  (
+  `id` bigint(20) NOT NULL COMMENT '主键',
+  `admin_id` bigint(20) NOT NULL COMMENT '操作者 ID，即管理员 ID',
+  `module` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '所属模块 (USER, PRODUCT, CREDIT, ACTIVATION)',
+  `action` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '具体动作',
+  `target_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '操作对象 ID (user_id 或 product_id)',
+  `before_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '操作前的原始数据',
+  `after_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '操作后的新数据/请求 Body',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '操作备注',
+  `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '操作员 IP 地址',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '操作时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_admin_id`(`admin_id`) USING BTREE,
+  INDEX `idx_module_action`(`module`, `action`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
