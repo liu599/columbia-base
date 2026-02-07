@@ -1,5 +1,7 @@
 package base.ecs32.top.api.service.impl;
 
+import base.ecs32.top.api.advice.BusinessException;
+import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.UserLoginRequest;
 import base.ecs32.top.api.dto.UserRegisterRequest;
 import base.ecs32.top.api.service.UserService;
@@ -35,7 +37,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional(rollbackFor = Exception.class)
     public UserRegisterVO register(UserRegisterRequest request) {
         if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())) != null) {
-            throw new RuntimeException("用户名已存在");
+            throw new BusinessException(ResultCode.USER_ERROR, "用户名已存在");
         }
 
         User user = new User();
@@ -54,13 +56,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserLoginVO login(UserLoginRequest request, String ip) {
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, request.getAccount()));
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, request.getAccount())
+                .or()
+                .eq(User::getPhone, request.getAccount()));
+
         if (user == null || !PasswordUtils.checkPassword(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("用户名或密码错误");
+            throw new BusinessException(ResultCode.USER_ERROR, "用户名或密码错误");
         }
 
         if (user.getStatus() == UserStatus.LOCKED) {
-            throw new RuntimeException("账号已锁定");
+            throw new BusinessException(ResultCode.USER_ERROR, "账号已锁定");
         }
 
         String token = JwtUtils.generateToken(user.getId(), user.getUsername());
@@ -82,7 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserProfileVO getProfile(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new BusinessException(ResultCode.USER_ERROR, "用户不存在");
         }
         return UserProfileVO.builder()
                 .id(user.getId())

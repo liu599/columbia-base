@@ -1,5 +1,7 @@
 package base.ecs32.top.api.service.impl;
 
+import base.ecs32.top.api.advice.BusinessException;
+import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.BatchCreateActivationRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
 import base.ecs32.top.api.vo.RedeemVO;
@@ -39,15 +41,15 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
                 new LambdaQueryWrapper<ActivationCode>().eq(ActivationCode::getCode, code)
         );
         if (ac == null) {
-            throw new RuntimeException("激活码不存在");
+            throw new BusinessException(ResultCode.USER_ERROR, "激活码不存在");
         }
         if (ac.getStatus() != ActivationCodeStatus.UNUSED) {
-            throw new RuntimeException("激活码已失效");
+            throw new BusinessException(ResultCode.USER_ERROR, "激活码已失效");
         }
 
         Product product = productMapper.selectById(ac.getProductId());
         if (product == null) {
-            throw new RuntimeException("关联产品不存在");
+            throw new BusinessException(ResultCode.USER_ERROR, "关联产品不存在");
         }
 
         ac.setStatus(ActivationCodeStatus.USED);
@@ -90,7 +92,7 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
     public void manualActivate(Long targetUserId, Long productId, String remark) {
         Product product = productMapper.selectById(productId);
         if (product == null) {
-            throw new RuntimeException("产品不存在");
+            throw new BusinessException(ResultCode.USER_ERROR, "产品不存在");
         }
 
         Integer addedCredits = product.getBaseCredits() != null ? product.getBaseCredits() : 0;

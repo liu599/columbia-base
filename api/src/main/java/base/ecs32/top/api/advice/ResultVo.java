@@ -25,4 +25,11 @@ public class ResultVo<T> {
         resultVo.setMessage(resultCode.getMessage());
         return resultVo;
     }
+
+    public static <T> ResultVo<T> fail(ResultCode resultCode, String message) {
+        ResultVo<T> resultVo = new ResultVo<>();
+        resultVo.setCode(resultCode.getCode());
+        resultVo.setMessage(message);
+        return resultVo;
+    }
 }
