@@ -1,5 +1,6 @@
 package base.ecs32.top.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @TableName("t_credit_balance")
 public class CreditBalance {
 
+    @TableId
     private Long userId;
 
     private Integer availableCredits;
