@@ -7,6 +7,7 @@ import base.ecs32.top.api.vo.UserLoginVO;
 import base.ecs32.top.api.vo.UserProfileVO;
 import base.ecs32.top.api.vo.UserRegisterVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +27,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public UserRegisterVO register(@RequestBody UserRegisterRequest request) {
+    public UserRegisterVO register(@Valid @RequestBody UserRegisterRequest request) {
         return userService.register(request);
     }
 
     @PostMapping("/login")
-    public UserLoginVO login(@RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
+    public UserLoginVO login(@Valid @RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
         return userService.login(request, httpServletRequest.getRemoteAddr());
     }
 

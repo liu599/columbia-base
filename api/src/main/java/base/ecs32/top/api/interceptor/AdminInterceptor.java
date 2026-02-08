@@ -11,6 +11,9 @@ public class AdminInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
         Object userIdObj = request.getAttribute("userId");
         if (userIdObj instanceof Long userId) {
             // Hardcoded admin range 1-10 as per requirement
