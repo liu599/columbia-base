@@ -10,3 +10,11 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开发环境打印 SQL 日志
+
+# Aliyun OSS 配置
+aliyun:
+  oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    accessKeyId: your_access_key_id
+    accessKeySecret: your_access_key_secret
+    bucketName: your_bucket_name

@@ -100,3 +100,26 @@ CREATE TABLE `t_audit_log`  (
   INDEX `idx_admin_id`(`admin_id`) USING BTREE,
   INDEX `idx_module_action`(`module`, `action`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for t_file
+-- ----------------------------
+DROP TABLE IF EXISTS `t_file`;
+CREATE TABLE `t_file` (
+    `id` BIGINT(20) NOT NULL COMMENT '主键 (雪花 ID)',
+    `file_uuid` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '业务唯一标识',
+    `file_md5` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件 MD5',
+    `user_id` BIGINT(20) NOT NULL COMMENT '用户 ID',
+    `bucket_name` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'OSS 桶名',
+    `oss_path` VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'OSS 路径',
+    `file_size` BIGINT(20) NOT NULL COMMENT '文件大小 (Bytes)',
+    `content_type` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'MIME 类型',
+    `metadata` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '业务自定义元数据',
+    `is_deleted` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除 (0: 正常, 1: 已删除)',
+    `create_time` DATETIME(0) DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME(0) DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE INDEX `uk_file_uuid` (`file_uuid`) USING BTREE,
+    UNIQUE INDEX `uk_user_file_md5` (`user_id`, `file_md5`) USING BTREE,
+    INDEX `idx_user_id` (`user_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
