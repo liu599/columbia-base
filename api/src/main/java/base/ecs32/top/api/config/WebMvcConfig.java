@@ -31,6 +31,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 );
 
         registry.addInterceptor(new AdminInterceptor())
-                .addPathPatterns("/api/v1/admin/**");
+                .addPathPatterns("/hyancie/api/v1/admin/**");
     }
 }

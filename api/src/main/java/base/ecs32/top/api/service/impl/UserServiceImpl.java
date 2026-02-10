@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -33,16 +34,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.userAuthMapper = userAuthMapper;
     }
 
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^1[3-9]\\d{9}$");
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserRegisterVO register(UserRegisterRequest request) {
+        // Validate phone number format
+        if (!PHONE_PATTERN.matcher(request.getPhone()).matches()) {
+            throw new BusinessException(ResultCode.USER_ERROR, "手机号格式不正确");
+        }
+
+        // Validate password strength
+        if (!PasswordUtils.isStrongPassword(request.getPassword())) {
+            throw new BusinessException(ResultCode.USER_ERROR, "密码强度不合格：必须包含1个大写字母、1个小写字母、1个特殊字符，且长度大于8位");
+        }
+
+        // Check if username already exists
         if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())) != null) {
             throw new BusinessException(ResultCode.USER_ERROR, "用户名已存在");
+        }
+
+        // Check if phone number already exists
+        if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, request.getPhone())) != null) {
+            throw new BusinessException(ResultCode.USER_ERROR, "手机号已存在");
         }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(PasswordUtils.hashPassword(request.getPassword()));
+        user.setPhone(request.getPhone());
         user.setStatus(UserStatus.NORMAL);
         user.setCreateTime(LocalDateTime.now());
         userMapper.insert(user);
