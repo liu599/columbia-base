@@ -45,3 +45,8 @@
 例如，如果您想修改用户相关的接口，您可以编辑 `UserController.java` 文件。
 
 所有的业务逻辑都封装在 `service` 层，对应的文件位于 `api/src/main/java/base/ecs32/top/api/service/` 目录下。
+
+## 部署
+
+mvn clean install
+nohup java -jar /root/columbia-base/api/target/api-1.0-rc.jar > /dev/null 2>&1 &
