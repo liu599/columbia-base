@@ -1,18 +1,15 @@
 package base.ecs32.top.api.vo;
 
 import base.ecs32.top.enums.UserRole;
-import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
-@Builder
-public class UserLoginVO {
+public class UserActivationCheckVO {
     private Long userId;
-    private String token;
-    private LocalDateTime expireTime;
-    private String username;
+    private Long productId;
+    private Boolean isActivated;
+    private Long activationId;
+    private String productName;
     private Integer roleLevel;
     private String roleDescription;
     private String avatarFileId;

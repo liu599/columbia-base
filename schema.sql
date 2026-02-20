@@ -9,6 +9,8 @@ CREATE TABLE `t_user`  (
   `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '手机号',
   `wechat_openid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '微信唯一标识',
   `status` int(11) NULL DEFAULT NULL COMMENT '0: 待激活, 1: 正常, 2: 锁定',
+  `role_level` int(11) NULL DEFAULT 1 COMMENT '角色等级: 1-游客, 3-正式用户, 5-付费用户, 7-内部管理用户, 10-系统管理员',
+  `avatar_file_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '头像文件ID (关联 t_file.file_uuid)',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '注册时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;

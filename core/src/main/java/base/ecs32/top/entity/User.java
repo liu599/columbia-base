@@ -25,5 +25,9 @@ public class User {
 
     private UserStatus status;
 
+    private Integer roleLevel;
+
+    private String avatarFileId;
+
     private LocalDateTime createTime;
 }

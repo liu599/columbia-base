@@ -1,0 +1,475 @@
+{
+  "info": {
+    "name": "Columbia Base Product API Collection",
+    "description": "API collection for Columbia Base backend - User and Product Activation System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "user_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "activation_code",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{user_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This script runs before each request",
+          "// You can add common setup here if needed"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Save admin_token from login response",
+          "if (pm.response.code === 200 && pm.request.url.path.join('/').includes('/login')) {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.token && jsonData.userId) {",
+          "        const userId = jsonData.userId;",
+          "        if (userId >= 1 && userId <= 10) {",
+          "            pm.collectionVariables.set('admin_token', jsonData.token);",
+          "            pm.collectionVariables.set('admin_id', userId.toString());",
+          "            console.log('Admin token saved: ' + jsonData.token);",
+          "        } else {",
+          "            pm.collectionVariables.set('user_token', jsonData.token);",
+          "            pm.collectionVariables.set('user_id', userId.toString());",
+          "            console.log('User token saved: ' + jsonData.token);",
+          "        }",
+          "    }",
+          "}",
+          "",
+          "// Save product_id from product creation",
+          "if (pm.response.code === 200 && pm.request.url.path.join('/').includes('/admin/product/save')) {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.data && jsonData.data.id) {",
+          "        pm.collectionVariables.set('product_id', jsonData.data.id.toString());",
+          "        console.log('Product ID saved: ' + jsonData.data.id);",
+          "    }",
+          "}",
+          "",
+          "// Save user_id from registration",
+          "if (pm.response.code === 200 && pm.request.url.path.join('/').includes('/register')) {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.data && jsonData.data.userId) {",
+          "        pm.collectionVariables.set('user_id', jsonData.data.userId.toString());",
+          "        console.log('User ID saved: ' + jsonData.data.userId);",
+          "    }",
+          "}",
+          "",
+          "// Save activation_code from batch create",
+          "if (pm.response.code === 200 && pm.request.url.path.join('/').includes('/batch-create')) {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.data && jsonData.data.codes && jsonData.data.codes.length > 0) {",
+          "        pm.collectionVariables.set('activation_code', jsonData.data.codes[0]);",
+          "        console.log('Activation code saved: ' + jsonData.data.codes[0]);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin (Login & Setup)",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account\": \"\",\n  \"password\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "login"]
+            },
+            "description": "Login as admin (requires userId in range 1-10). After login, the response contains a token that should be saved to admin_token variable from Tests tab."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"name\": \"AI 写作助手\",\n  \"description\": \"智能文档生成与编辑助手\",\n  \"baseCredits\": 1000,\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/product/save",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "product", "save"]
+            },
+            "description": "Create a new product. Save the returned product_id to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Batch Create Activation Codes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{product_id}},\n  \"count\": 5,\n  \"codePrefix\": \"AI-WRITER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/activation/batch-create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "activation", "batch-create"]
+            },
+            "description": "Generate activation codes for a product. Save one of the codes for user redemption."
+          },
+          "response": []
+        },
+        {
+          "name": "List Products",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"\",\n  \"page\": 1,\n  \"pageSize\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/product/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "product", "list"]
+            },
+            "description": "List all available products (public endpoint)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin operations for login and product/code management"
+    },
+    {
+      "name": "User (Registration & Login)",
+      "item": [
+        {
+          "name": "User Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser001\",\n  \"phone\": \"13800138001\",\n  \"password\": \"Test@1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "register"]
+            },
+            "description": "Register a new user. Save the returned userId to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account\": \"testuser001\",\n  \"password\": \"Test@1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "login"]
+            },
+            "description": "Login as regular user. The response contains a token that should be saved to user_token variable from Tests tab."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "profile"]
+            },
+            "description": "Get current user profile information."
+          },
+          "response": []
+        }
+      ],
+      "description": "User registration and login operations"
+    },
+    {
+      "name": "User Activation Operations",
+      "item": [
+        {
+          "name": "Redeem Activation Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{activation_code}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/activation/redeem",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "activation", "redeem"]
+            },
+            "description": "Activate a product using an activation code. The code is obtained from admin batchCreate."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User's Activated Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/activation/my-products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "activation", "my-products"]
+            },
+            "description": "Query all products that the current user has activated."
+          },
+          "response": []
+        }
+      ],
+      "description": "User-side product activation operations"
+    },
+    {
+      "name": "Admin User Management",
+      "item": [
+        {
+          "name": "Check User Product Activation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetUserId\": {{user_id}},\n  \"productId\": {{product_id}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/activation/check-user",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "activation", "check-user"]
+            },
+            "description": "Check if a specific user has activated a specific product."
+          },
+          "response": []
+        },
+        {
+          "name": "Manual Activate Product for User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetUserId\": {{user_id}},\n  \"productId\": {{product_id}},\n  \"remark\": \"Admin manual activation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/product/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "product", "activate"]
+            },
+            "description": "Admin can manually activate a product for a user without using an activation code."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate (Reverse) User's Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetUserId\": {{user_id}},\n  \"productId\": {{product_id}},\n  \"remark\": \"User refund requested\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/activation/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "activation", "deactivate"]
+            },
+            "description": "Deactivate a product for a user and deduct corresponding credits."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetUserId\": {{user_id}},\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/user/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "user", "status"]
+            },
+            "description": "Update user status (0: locked/banned, 1: normal)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin operations on users"
+    },
+    {
+      "name": "Admin Credit Management",
+      "item": [],
+      "description": "Admin credit operations (Add if needed)"
+    }
+  ]
+}

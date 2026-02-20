@@ -3,6 +3,7 @@ package base.ecs32.top.api.controller;
 import base.ecs32.top.api.dto.RedeemRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
 import base.ecs32.top.api.vo.RedeemVO;
+import base.ecs32.top.api.vo.UserActivationsVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,5 +17,10 @@ public class ActivationController {
     @PostMapping("/redeem")
     public RedeemVO redeem(@RequestAttribute("userId") Long userId, @RequestBody RedeemRequest request) {
         return activationCodeService.redeem(userId, request.getCode());
+    }
+
+    @GetMapping("/my-products")
+    public UserActivationsVO getMyActivations(@RequestAttribute("userId") Long userId) {
+        return activationCodeService.getUserActivations(userId);
     }
 }

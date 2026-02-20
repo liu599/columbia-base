@@ -2,18 +2,28 @@ package base.ecs32.top.api.service.impl;
 
 import base.ecs32.top.api.advice.BusinessException;
 import base.ecs32.top.api.advice.ResultCode;
+import base.ecs32.top.api.dto.SearchRequest;
 import base.ecs32.top.api.dto.UserLoginRequest;
 import base.ecs32.top.api.dto.UserRegisterRequest;
 import base.ecs32.top.api.service.UserService;
 import base.ecs32.top.api.util.JwtUtils;
+import base.ecs32.top.api.util.OssUtils;
 import base.ecs32.top.api.util.PasswordUtils;
+import base.ecs32.top.api.util.QueryWrapperUtils;
+import base.ecs32.top.api.vo.PageResponse;
+import base.ecs32.top.api.vo.UserListVO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import base.ecs32.top.api.vo.UserLoginVO;
 import base.ecs32.top.api.vo.UserProfileVO;
 import base.ecs32.top.api.vo.UserRegisterVO;
+import base.ecs32.top.dao.FileMapper;
 import base.ecs32.top.dao.UserAuthMapper;
 import base.ecs32.top.dao.UserMapper;
+import base.ecs32.top.entity.File;
 import base.ecs32.top.entity.User;
 import base.ecs32.top.entity.UserAuth;
+import base.ecs32.top.enums.UserRole;
 import base.ecs32.top.enums.UserStatus;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +31,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.regex.Pattern;
 
 @Service
@@ -28,13 +41,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final UserMapper userMapper;
     private final UserAuthMapper userAuthMapper;
+    private final FileMapper fileMapper;
+    private final OssUtils ossUtils;
 
-    public UserServiceImpl(UserMapper userMapper, UserAuthMapper userAuthMapper) {
+    public UserServiceImpl(UserMapper userMapper, UserAuthMapper userAuthMapper, FileMapper fileMapper, OssUtils ossUtils) {
         this.userMapper = userMapper;
         this.userAuthMapper = userAuthMapper;
+        this.fileMapper = fileMapper;
+        this.ossUtils = ossUtils;
     }
 
     private static final Pattern PHONE_PATTERN = Pattern.compile("^1[3-9]\\d{9}$");
+    private static final long DEFAULT_EXPIRATION = 3600; // 1 hour
+
+    /**
+     * 默认注册用户角色等级：正式用户(3)
+     */
+    private static final Integer DEFAULT_ROLE_LEVEL = UserRole.REGULAR_USER.getLevel();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -64,6 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(PasswordUtils.hashPassword(request.getPassword()));
         user.setPhone(request.getPhone());
         user.setStatus(UserStatus.NORMAL);
+        user.setRoleLevel(DEFAULT_ROLE_LEVEL);
         user.setCreateTime(LocalDateTime.now());
         userMapper.insert(user);
 
@@ -97,10 +121,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         auth.setExpireTime(LocalDateTime.now().plusDays(7));
         userAuthMapper.insert(auth);
 
+        UserRole userRole = UserRole.fromLevel(user.getRoleLevel());
         return UserLoginVO.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
                 .token(token)
+                .roleLevel(user.getRoleLevel())
+                .roleDescription(userRole.getDescription())
+                .avatarFileId(user.getAvatarFileId())
                 .build();
     }
 
@@ -110,11 +138,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             throw new BusinessException(ResultCode.USER_ERROR, "用户不存在");
         }
+
+        String avatarSignedUrl = null;
+        if (user.getAvatarFileId() != null) {
+            File file = fileMapper.selectOne(new LambdaQueryWrapper<File>()
+                    .eq(File::getFileUuid, user.getAvatarFileId())
+                    .eq(File::getIsDeleted, 0));
+            if (file != null) {
+                avatarSignedUrl = ossUtils.generateSignedUrl(file.getBucketName(), file.getOssPath(), DEFAULT_EXPIRATION);
+            }
+        }
+
+        UserRole userRole = UserRole.fromLevel(user.getRoleLevel());
         return UserProfileVO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .phone(user.getPhone())
+                .wechatOpenid(user.getWechatOpenid())
                 .status(user.getStatus())
+                .roleLevel(user.getRoleLevel())
+                .roleDescription(userRole.getDescription())
+                .avatarFileId(user.getAvatarFileId())
+                .avatarSignedUrl(avatarSignedUrl)
                 .createTime(user.getCreateTime())
                 .build();
+    }
+
+    @Override
+    public PageResponse<UserListVO> listUsers(SearchRequest request) {
+        Page<User> page = new Page<>(request.getCurrent(), request.getPageSize());
+        QueryWrapper<User> wrapper = QueryWrapperUtils.buildWrapper(request, Arrays.asList("username", "phone"));
+
+        userMapper.selectPage(page, wrapper);
+
+        List<UserListVO> voList = page.getRecords().stream()
+                .map(user -> UserListVO.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .phone(user.getPhone())
+                        .wechatOpenid(user.getWechatOpenid())
+                        .status(user.getStatus())
+                        .roleLevel(user.getRoleLevel())
+                        .avatarFileId(user.getAvatarFileId())
+                        .createTime(user.getCreateTime())
+                        .build())
+                .collect(Collectors.toList());
+
+        return PageResponse.of(voList, page.getTotal(), (int) page.getCurrent(), (int) page.getSize());
     }
 }

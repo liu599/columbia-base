@@ -2,13 +2,18 @@ package base.ecs32.top.api.config;
 
 import base.ecs32.top.api.interceptor.AdminInterceptor;
 import base.ecs32.top.api.interceptor.AuthInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    private final AuthInterceptor authInterceptor;
+    private final AdminInterceptor adminInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -22,7 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthInterceptor())
+        registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
                         "/api/v1/user/register",
@@ -30,7 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/user/health"
                 );
 
-        registry.addInterceptor(new AdminInterceptor())
-                .addPathPatterns("/hyancie/api/v1/admin/**");
+        registry.addInterceptor(adminInterceptor)
+                .addPathPatterns("/api/v1/admin/**");
     }
 }

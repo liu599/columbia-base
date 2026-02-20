@@ -5,6 +5,8 @@ import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.BatchCreateActivationRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
 import base.ecs32.top.api.vo.RedeemVO;
+import base.ecs32.top.api.vo.UserActivationVO;
+import base.ecs32.top.api.vo.UserActivationsVO;
 import base.ecs32.top.dao.ActivationCodeMapper;
 import base.ecs32.top.dao.CreditBalanceMapper;
 import base.ecs32.top.dao.CreditLogMapper;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,14 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
     private final ProductMapper productMapper;
     private final CreditBalanceMapper creditBalanceMapper;
     private final CreditLogMapper creditLogMapper;
+
+    /**
+     * 白名单内的产品ID，同一用户可以重复激活多次
+     */
+    private static final List<Long> MULTI_ACTIVATION_PRODUCT_WHITELIST = List.of(
+            // 可重复激活的产品ID列表
+            // 示例: 1L, 2L, 3L
+    );
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -50,6 +61,19 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
         Product product = productMapper.selectById(ac.getProductId());
         if (product == null) {
             throw new BusinessException(ResultCode.USER_ERROR, "关联产品不存在");
+        }
+
+        // 检查是否可以重复激活（不在白名单内的产品不能重复激活）
+        if (!MULTI_ACTIVATION_PRODUCT_WHITELIST.contains(ac.getProductId())) {
+            ActivationCode existingActivation = activationCodeMapper.selectOne(
+                    new LambdaQueryWrapper<ActivationCode>()
+                            .eq(ActivationCode::getUserId, userId)
+                            .eq(ActivationCode::getProductId, ac.getProductId())
+                            .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
+            );
+            if (existingActivation != null) {
+                throw new BusinessException(ResultCode.USER_ERROR, "该产品您已激活，无法重复激活");
+            }
         }
 
         ac.setStatus(ActivationCodeStatus.USED);
@@ -124,7 +148,7 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
     public List<String> batchCreate(BatchCreateActivationRequest request) {
         List<String> codes = new ArrayList<>();
         String prefix = request.getCodePrefix() != null ? request.getCodePrefix() + "-" : "";
-        
+
         for (int i = 0; i < request.getCount(); i++) {
             String code = prefix + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             ActivationCode ac = new ActivationCode();
@@ -135,5 +159,94 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
             codes.add(code);
         }
         return codes;
+    }
+
+    @Override
+    public UserActivationsVO getUserActivations(Long userId) {
+        List<ActivationCode> activations = activationCodeMapper.selectList(
+                new LambdaQueryWrapper<ActivationCode>()
+                        .eq(ActivationCode::getUserId, userId)
+                        .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
+        );
+
+        List<UserActivationVO> activationVOs = activations.stream().map(ac -> {
+            Product product = productMapper.selectById(ac.getProductId());
+            UserActivationVO vo = new UserActivationVO();
+            vo.setActivationId(ac.getId());
+            vo.setProductId(ac.getProductId());
+            if (product != null) {
+                vo.setProductName(product.getName());
+                vo.setProductDescription(product.getDescription());
+            }
+            vo.setActivationCode(ac.getCode());
+            vo.setActivatedAt(ac.getUsedTime());
+            return vo;
+        }).collect(Collectors.toList());
+
+        UserActivationsVO result = new UserActivationsVO();
+        result.setUserId(userId);
+        result.setTotalActivations(activationVOs.size());
+        result.setActivations(activationVOs);
+        return result;
+    }
+
+    @Override
+    public boolean checkUserActivation(Long userId, Long productId) {
+        ActivationCode activation = activationCodeMapper.selectOne(
+                new LambdaQueryWrapper<ActivationCode>()
+                        .eq(ActivationCode::getUserId, userId)
+                        .eq(ActivationCode::getProductId, productId)
+                        .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
+        );
+        return activation != null;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deactivateUserProduct(Long userId, Long productId, String remark) {
+        ActivationCode activation = activationCodeMapper.selectOne(
+                new LambdaQueryWrapper<ActivationCode>()
+                        .eq(ActivationCode::getUserId, userId)
+                        .eq(ActivationCode::getProductId, productId)
+                        .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
+        );
+
+        if (activation == null) {
+            throw new BusinessException(ResultCode.USER_ERROR, "用户未激活该产品");
+        }
+
+        Product product = productMapper.selectById(productId);
+        if (product == null) {
+            throw new BusinessException(ResultCode.USER_ERROR, "产品不存在");
+        }
+
+        Integer creditsToDeduct = product.getBaseCredits() != null ? product.getBaseCredits() : 0;
+        CreditBalance balance = creditBalanceMapper.selectById(userId);
+        if (balance != null && balance.getAvailableCredits() >= creditsToDeduct) {
+            balance.setAvailableCredits(balance.getAvailableCredits() - creditsToDeduct);
+            balance.setUpdateTime(LocalDateTime.now());
+            creditBalanceMapper.updateById(balance);
+
+            CreditLog log = new CreditLog();
+            log.setUserId(userId);
+            log.setType(CreditLogType.CONSUME);
+            log.setAmount(-creditsToDeduct);
+            log.setDescription("反激活产品: " + product.getName() + (remark != null ? " (" + remark + ")" : ""));
+            log.setCreateTime(LocalDateTime.now());
+            creditLogMapper.insert(log);
+        }
+
+        activation.setStatus(ActivationCodeStatus.EXPIRED);
+        activationCodeMapper.updateById(activation);
+    }
+
+    @Override
+    public ActivationCode findUserActivation(Long userId, Long productId) {
+        return activationCodeMapper.selectOne(
+                new LambdaQueryWrapper<ActivationCode>()
+                        .eq(ActivationCode::getUserId, userId)
+                        .eq(ActivationCode::getProductId, productId)
+                        .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
+        );
     }
 }

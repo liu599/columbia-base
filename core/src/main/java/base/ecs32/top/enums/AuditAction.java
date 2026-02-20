@@ -13,7 +13,9 @@ public enum AuditAction {
     MANUAL_ACTIVATE("手动激活产品"),
     MANUAL_RECHARGE("人工充值"),
     BATCH_CREATE_CODE("批量建码"),
-    QUERY_AUDIT_LOG("查询审计日志");
+    QUERY_AUDIT_LOG("查询审计日志"),
+    DEACTIVATE_PRODUCT("反激活产品"),
+    QUERY_USER_ACTIVATION("查询用户激活状态");
 
     private final String description;
 }

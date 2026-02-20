@@ -1,7 +1,6 @@
 package base.ecs32.top.api.vo;
 
 import base.ecs32.top.enums.UserStatus;
-import base.ecs32.top.enums.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,15 +8,13 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class UserProfileVO {
+public class UserListVO {
     private Long id;
     private String username;
     private String phone;
     private String wechatOpenid;
     private UserStatus status;
     private Integer roleLevel;
-    private String roleDescription;
     private String avatarFileId;
-    private String avatarSignedUrl;
     private LocalDateTime createTime;
 }
