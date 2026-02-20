@@ -4,10 +4,12 @@ import base.ecs32.top.api.aspect.AdminAudit;
 import base.ecs32.top.api.aspect.AuditContext;
 import base.ecs32.top.api.dto.BatchCreateActivationRequest;
 import base.ecs32.top.api.dto.DeactivateProductRequest;
+import base.ecs32.top.api.dto.SearchRequest;
 import base.ecs32.top.api.dto.UserActivationCheckRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
 import base.ecs32.top.api.service.ProductService;
 import base.ecs32.top.api.service.UserService;
+import base.ecs32.top.api.vo.ActivationCodeListVO;
 import base.ecs32.top.entity.ActivationCode;
 import base.ecs32.top.entity.Product;
 import base.ecs32.top.entity.User;
@@ -92,5 +94,11 @@ public class AdminActivationController {
         data.put("product_id", request.getProductId());
         data.put("product_name", product != null ? product.getName() : "Unknown");
         return data;
+    }
+
+    @PostMapping("/list")
+    @AdminAudit(module = AuditModule.ACTIVATION, action = AuditAction.QUERY_ACTIVATION_CODES)
+    public ActivationCodeListVO.ActivationCodePageResponse listActivationCodes(@RequestBody SearchRequest request) {
+        return activationCodeService.listActivationCodes(request);
     }
 }

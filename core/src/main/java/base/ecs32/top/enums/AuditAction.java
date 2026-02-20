@@ -15,7 +15,8 @@ public enum AuditAction {
     BATCH_CREATE_CODE("批量建码"),
     QUERY_AUDIT_LOG("查询审计日志"),
     DEACTIVATE_PRODUCT("反激活产品"),
-    QUERY_USER_ACTIVATION("查询用户激活状态");
+    QUERY_USER_ACTIVATION("查询用户激活状态"),
+    QUERY_ACTIVATION_CODES("查询激活码列表");
 
     private final String description;
 }

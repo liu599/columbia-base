@@ -3,7 +3,10 @@ package base.ecs32.top.api.service.impl;
 import base.ecs32.top.api.advice.BusinessException;
 import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.BatchCreateActivationRequest;
+import base.ecs32.top.api.dto.SearchRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
+import base.ecs32.top.api.util.QueryWrapperUtils;
+import base.ecs32.top.api.vo.ActivationCodeListVO;
 import base.ecs32.top.api.vo.RedeemVO;
 import base.ecs32.top.api.vo.UserActivationVO;
 import base.ecs32.top.api.vo.UserActivationsVO;
@@ -11,13 +14,17 @@ import base.ecs32.top.dao.ActivationCodeMapper;
 import base.ecs32.top.dao.CreditBalanceMapper;
 import base.ecs32.top.dao.CreditLogMapper;
 import base.ecs32.top.dao.ProductMapper;
+import base.ecs32.top.dao.UserMapper;
 import base.ecs32.top.entity.ActivationCode;
 import base.ecs32.top.entity.CreditBalance;
 import base.ecs32.top.entity.CreditLog;
 import base.ecs32.top.entity.Product;
+import base.ecs32.top.entity.User;
 import base.ecs32.top.enums.ActivationCodeStatus;
 import base.ecs32.top.enums.CreditLogType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +42,7 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
 
     private final ActivationCodeMapper activationCodeMapper;
     private final ProductMapper productMapper;
+    private final UserMapper userMapper;
     private final CreditBalanceMapper creditBalanceMapper;
     private final CreditLogMapper creditLogMapper;
 
@@ -247,6 +256,67 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
                         .eq(ActivationCode::getUserId, userId)
                         .eq(ActivationCode::getProductId, productId)
                         .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
+        );
+    }
+
+    @Override
+    public ActivationCodeListVO.ActivationCodePageResponse listActivationCodes(SearchRequest request) {
+        Page<ActivationCode> page = new Page<>(request.getCurrent(), request.getPageSize());
+        QueryWrapper<ActivationCode> wrapper = QueryWrapperUtils.buildWrapper(request, List.of("code"));
+
+        activationCodeMapper.selectPage(page, wrapper);
+
+        List<ActivationCode> activationCodes = page.getRecords();
+        List<Long> productIds = activationCodes.stream()
+            .map(ActivationCode::getProductId)
+            .distinct()
+            .collect(Collectors.toList());
+        List<Product> products = productIds.isEmpty() ? List.of() : productMapper.selectBatchIds(productIds);
+        Map<Long, Product> productMap = products.stream()
+            .collect(Collectors.toMap(Product::getId, p -> p));
+
+        List<Long> userIds = activationCodes.stream()
+            .map(ActivationCode::getUserId)
+            .filter(id -> id != null)
+            .distinct()
+            .collect(Collectors.toList());
+        List<User> users = userIds.isEmpty() ? List.of() : userMapper.selectBatchIds(userIds);
+        Map<Long, User> userMap = users.stream()
+            .collect(Collectors.toMap(User::getId, u -> u));
+
+        List<ActivationCodeListVO> voList = activationCodes.stream().map(ac -> {
+            ActivationCodeListVO vo = new ActivationCodeListVO();
+            vo.setId(ac.getId());
+            vo.setCode(ac.getCode());
+            vo.setProductId(ac.getProductId());
+            vo.setStatus(ac.getStatus());
+            vo.setStatusDescription(ac.getStatus().getDescription());
+            vo.setUserId(ac.getUserId());
+            vo.setUsedTime(ac.getUsedTime());
+
+            Product product = productMap.get(ac.getProductId());
+            if (product != null) {
+                vo.setProductName(product.getName());
+                vo.setProductDescription(product.getDescription());
+            }
+
+            if (ac.getUserId() != null) {
+                User user = userMap.get(ac.getUserId());
+                if (user != null) {
+                    vo.setUsername(user.getUsername());
+                    vo.setUserRoleLevel(user.getRoleLevel());
+                    vo.setUserStatus(user.getStatus().getDescription());
+                }
+            }
+
+            return vo;
+        }).collect(Collectors.toList());
+
+        return ActivationCodeListVO.ActivationCodePageResponse.of(
+            voList,
+            page.getTotal(),
+            (int) page.getCurrent(),
+            (int) page.getSize()
         );
     }
 }

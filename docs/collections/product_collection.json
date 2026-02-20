@@ -207,7 +207,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"keyword\": \"\",\n  \"page\": 1,\n  \"pageSize\": 10\n}"
+              "raw": "{\n  \"keyword\": \"\",\n  \"current\": 1,\n  \"pageSize\": 10\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/product/list",
@@ -215,6 +215,33 @@
               "path": ["api", "v1", "product", "list"]
             },
             "description": "List all available products (public endpoint)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Activation Codes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"\",\n  \"current\": 1,\n  \"pageSize\": 20,\n  \"filter\": {\n    \"status\": 0\n  },\n  \"sort\": {\n    \"field\": \"id\",\n    \"order\": \"desc\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/activation/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "activation", "list"]
+            },
+            "description": "List all activation codes with pagination, keyword search, and filtering. Supports filtering by status (0: unused, 1: used, 2: expired)."
           },
           "response": []
         }
