@@ -43,6 +43,12 @@ public class FileServiceImpl implements FileService {
         try {
             String originalFilename = multipartFile.getOriginalFilename();
             String contentType = multipartFile.getContentType();
+            if (contentType == null && originalFilename != null) {
+                contentType = OssUtils.guessContentTypeFromName(originalFilename);
+            }
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
             long fileSize = multipartFile.getSize();
             byte[] bytes = multipartFile.getBytes();
             String md5 = DigestUtils.md5DigestAsHex(bytes);

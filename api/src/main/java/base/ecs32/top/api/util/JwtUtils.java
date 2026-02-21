@@ -16,7 +16,7 @@ public class JwtUtils {
     private static final String SECRET_KEY = "your-very-secure-and-long-secret-key-that-must-be-at-least-32-chars";
     private static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds
 
-    private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    public static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     public static String generateToken(Long userId, String username) {
         Map<String, Object> claims = new HashMap<>();
@@ -52,7 +52,7 @@ public class JwtUtils {
         return claimsResolver.apply(claims);
     }
 
-    private static Claims extractAllClaims(String token) {
+    public static Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

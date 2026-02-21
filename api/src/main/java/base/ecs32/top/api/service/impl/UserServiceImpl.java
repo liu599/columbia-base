@@ -67,6 +67,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ResultCode.USER_ERROR, "手机号格式不正确");
         }
 
+        // Extract wechatOpenid from temporary token if present
+        String wechatOpenid = extractWechatOpenidFromToken(request.getTempToken());
+
         // Validate password strength
         if (!PasswordUtils.isStrongPassword(request.getPassword())) {
             throw new BusinessException(ResultCode.USER_ERROR, "密码强度不合格：必须包含1个大写字母、1个小写字母、1个特殊字符，且长度大于8位");
@@ -86,6 +89,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUsername(request.getUsername());
         user.setPassword(PasswordUtils.hashPassword(request.getPassword()));
         user.setPhone(request.getPhone());
+        user.setWechatOpenid(wechatOpenid);
         user.setStatus(UserStatus.NORMAL);
         user.setRoleLevel(DEFAULT_ROLE_LEVEL);
         user.setCreateTime(LocalDateTime.now());
@@ -185,5 +189,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .collect(Collectors.toList());
 
         return PageResponse.of(voList, page.getTotal(), (int) page.getCurrent(), (int) page.getSize());
+    }
+
+    private String extractWechatOpenidFromToken(String tempToken) {
+        if (tempToken == null || tempToken.isEmpty()) {
+            return null;
+        }
+
+        try {
+            io.jsonwebtoken.Claims claims = JwtUtils.extractAllClaims(tempToken);
+            Boolean isTemp = claims.get("temp", Boolean.class);
+            if (isTemp != null && isTemp) {
+                return claims.get("wechatOpenid", String.class);
+            }
+        } catch (Exception e) {
+            // Ignore token parsing errors
+        }
+        return null;
     }
 }

@@ -1,0 +1,146 @@
+{
+  "info": {
+    "name": "WeChat Auth API",
+    "_postman_id": "wechat-auth-api",
+    "description": "WeChat Mini Program Scan Code Login API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:10338/hyancie",
+      "type": "string"
+    },
+    {
+      "key": "appId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "secret",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "whitelistToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sceneId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "loginCode",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get WeChat QR Code",
+      "request": {
+        "description": "Get unlimited mini-program QR code (requires whitelist token in Authorization header)",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{whitelistToken}}",
+            "type": "text"
+          }
+        ],
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wechat/qrcode",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "wechat", "qrcode"]
+        },
+        "response": []
+      },
+      "response": []
+    },
+    {
+      "name": "Get WeChat Access Token (Direct)",
+      "request": {
+        "description": "Get WeChat access token directly from WeChat API for testing purposes",
+        "method": "GET",
+        "url": {
+          "raw": "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={{appId}}&secret={{secret}}",
+          "protocol": "https",
+          "host": ["api", "weixin", "qq", "com"],
+          "path": ["cgi-bin", "token"],
+          "query": [
+            {
+              "key": "grant_type",
+              "value": "client_credential"
+            },
+            {
+              "key": "appid",
+              "value": "{{appId}}"
+            },
+            {
+              "key": "secret",
+              "value": "{{secret}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login with WeChat (Scan Code)",
+      "request": {
+        "description": "Scan QR code to login. Get sceneId from QR code display and loginCode from WeChat mini-program",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sceneId\": \"{{sceneId}}\",\n  \"loginCode\": \"{{loginCode}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/wechat/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "wechat", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get OpenID from Login Code (Direct)",
+      "request": {
+        "description": "Get openid directly from WeChat API using loginCode for testing",
+        "method": "GET",
+        "url": {
+          "raw": "https://api.weixin.qq.com/sns/jscode2session?appid={{appId}}&secret={{secret}}&js_code={{loginCode}}&grant_type=authorization_code",
+          "protocol": "https",
+          "host": ["api", "weixin", "qq", "com"],
+          "path": ["sns", "jscode2session"],
+          "query": [
+            {
+              "key": "appid",
+              "value": "{{appId}}"
+            },
+            {
+              "key": "secret",
+              "value": "{{secret}}"
+            },
+            {
+              "key": "js_code",
+              "value": "{{loginCode}}"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

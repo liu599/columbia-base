@@ -32,7 +32,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/v1/user/register",
                         "/api/v1/user/login",
-                        "/api/v1/user/health"
+                        "/api/v1/user/health",
+                        "/api/v1/wechat/login",
+                        "/api/v1/wechat/qrcode"
                 );
 
         registry.addInterceptor(adminInterceptor)

@@ -10,6 +10,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.net.URL;
 import java.util.Date;
 
@@ -67,5 +68,16 @@ public class OssUtils {
      */
     public void deleteFile(String bucketName, String objectName) {
         ossClient.deleteObject(bucketName, objectName);
+    }
+
+    /**
+     * 根据文件名推测 Content-Type
+     */
+    public static String guessContentTypeFromName(String filename) {
+        if (filename == null) {
+            return null;
+        }
+        String contentType = URLConnection.guessContentTypeFromName(filename.toLowerCase());
+        return contentType;
     }
 }
