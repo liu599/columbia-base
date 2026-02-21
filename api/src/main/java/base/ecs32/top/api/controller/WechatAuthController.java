@@ -33,4 +33,10 @@ public class WechatAuthController {
     public String loginWithWechat(@RequestBody WechatLoginRequest request) {
         return wechatAuthService.loginWithWechat(request.getSceneId(), request.getLoginCode());
     }
+
+    @PostMapping("/refresh-token")
+    public String refreshAccessToken(@RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        return wechatAuthService.refreshAccessToken(actualToken);
+    }
 }

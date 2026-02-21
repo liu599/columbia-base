@@ -189,6 +189,20 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
     }
 
     @Override
+    public String refreshAccessToken(String token) {
+        if (wechatConfig.getQrcodeWhitelist() == null ||
+                !wechatConfig.getQrcodeWhitelist().contains(token)) {
+            throw new BusinessException(ResultCode.USER_ERROR, "无权限访问");
+        }
+
+        // 先删除 Redis 中的缓存的 token
+        stringRedisTemplate.delete(wechatConfig.getAccessTokenKey());
+
+        // 重新获取新的 token
+        return getAccessToken();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public String loginWithWechat(String sceneId, String loginCode) {
         WechatAuth wechatAuth = wechatAuthMapper.selectOne(

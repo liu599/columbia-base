@@ -23,4 +23,11 @@ public interface WechatAuthService {
      * @return 登录token或临时注册token
      */
     String loginWithWechat(String sceneId, String loginCode);
+
+    /**
+     * 强制刷新微信access_token
+     * @param token 白名单token
+     * @return 刷新后的access_token
+     */
+    String refreshAccessToken(String token);
 }
