@@ -4,11 +4,13 @@
 DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user`  (
   `id` bigint(20) NOT NULL COMMENT '主键',
-  `username` varchar(191) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '用户名',
+  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '用户名',
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '哈希密码',
   `phone` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '手机号',
   `wechat_openid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '微信唯一标识',
   `status` int(11) NULL DEFAULT NULL COMMENT '0: 待激活, 1: 正常, 2: 锁定',
+  `role_level` int(11) NULL DEFAULT 1 COMMENT '角色等级: 1-游客, 3-正式用户, 5-付费用户, 7-内部管理用户, 10-系统管理员',
+  `avatar_file_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '头像文件ID (关联 t_file.file_uuid)',
   `create_time` datetime NULL DEFAULT NULL COMMENT '注册时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
@@ -72,7 +74,7 @@ CREATE TABLE `t_credit_log`  (
 DROP TABLE IF EXISTS `t_activation_code`;
 CREATE TABLE `t_activation_code`  (
   `id` bigint(20) NOT NULL,
-  `code` varchar(191) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '唯一索引，建议 8-12 位随机字符',
+  `code` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '唯一索引，建议 8-12 位随机字符',
   `product_id` bigint(20) NULL DEFAULT NULL COMMENT '关联产品 ID',
   `status` int(11) NULL DEFAULT NULL COMMENT '0: 未使用, 1: 已使用, 2: 已过期',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '谁核销了这个码',
@@ -88,8 +90,8 @@ DROP TABLE IF EXISTS `t_audit_log`;
 CREATE TABLE `t_audit_log`  (
   `id` bigint(20) NOT NULL COMMENT '主键',
   `admin_id` bigint(20) NOT NULL COMMENT '操作者 ID，即管理员 ID',
-  `module` varchar(191) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '所属模块 (USER, PRODUCT, CREDIT, ACTIVATION)',
-  `action` varchar(191) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '具体动作',
+  `module` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '所属模块 (USER, PRODUCT, CREDIT, ACTIVATION)',
+  `action` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '具体动作',
   `target_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '操作对象 ID (user_id 或 product_id)',
   `before_value` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT '操作前的原始数据',
   `after_value` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT '操作后的新数据/请求 Body',
