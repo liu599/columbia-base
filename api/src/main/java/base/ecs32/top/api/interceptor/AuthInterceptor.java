@@ -47,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         System.out.println("AuthInterceptor: Auth failed - " + errorMessage);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        ResultVo<Object> resultVo = ResultVo.fail(ResultCode.USER_ERROR, errorMessage);
+        ResultVo<Object> resultVo = ResultVo.fail(ResultCode.USER_NOT_LOGGED_IN, errorMessage);
         response.getWriter().write(new ObjectMapper().writeValueAsString(resultVo));
         return false;
     }

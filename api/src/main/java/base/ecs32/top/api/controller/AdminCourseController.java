@@ -96,7 +96,7 @@ public class AdminCourseController {
         Long adminId = (Long) httpRequest.getAttribute("userId");
         User admin = userMapper.selectById(adminId);
         if (admin == null || UserRole.fromLevel(admin.getRoleLevel()).getLevel() < UserRole.INTERNAL_ADMIN.getLevel()) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无权限访问此接口");
+            throw new BusinessException(ResultCode.PERMISSION_DENIED, "无权限访问此接口");
         }
 
         return courseService.getUserCourses(userId);
@@ -115,7 +115,7 @@ public class AdminCourseController {
         Long adminId = (Long) httpRequest.getAttribute("userId");
         User admin = userMapper.selectById(adminId);
         if (admin == null || UserRole.fromLevel(admin.getRoleLevel()).getLevel() < UserRole.INTERNAL_ADMIN.getLevel()) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无权限访问此接口");
+            throw new BusinessException(ResultCode.PERMISSION_DENIED, "无权限访问此接口");
         }
 
         courseService.updateUserCourseAccess(userId, courseId, request);

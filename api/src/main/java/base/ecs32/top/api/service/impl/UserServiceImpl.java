@@ -64,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserRegisterVO register(UserRegisterRequest request) {
         // Validate phone number format
         if (!PHONE_PATTERN.matcher(request.getPhone()).matches()) {
-            throw new BusinessException(ResultCode.USER_ERROR, "手机号格式不正确");
+            throw new BusinessException(ResultCode.PHONE_FORMAT_NOT_VALID, "手机号格式不正确");
         }
 
         // Extract wechatOpenid from temporary token if present
@@ -72,17 +72,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // Validate password strength
         if (!PasswordUtils.isStrongPassword(request.getPassword())) {
-            throw new BusinessException(ResultCode.USER_ERROR, "密码强度不合格：必须包含1个大写字母、1个小写字母、1个特殊字符，且长度大于8位");
+            throw new BusinessException(ResultCode.PASSWORD_NOT_VALID, "密码强度不合格：必须包含1个大写字母、1个小写字母、1个特殊字符，且长度大于8位");
         }
 
         // Check if username already exists
         if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())) != null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "用户名已存在");
+            throw new BusinessException(ResultCode.USERNAME_ALREADY_EXISTS, "用户名已存在");
         }
 
         // Check if phone number already exists
         if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, request.getPhone())) != null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "手机号已存在");
+            throw new BusinessException(ResultCode.PHONE_ALREADY_EXISTS, "手机号已存在");
         }
 
         User user = new User();
@@ -110,11 +110,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .eq(User::getPhone, request.getAccount()));
 
         if (user == null || !PasswordUtils.checkPassword(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ResultCode.USER_ERROR, "用户名或密码错误");
+            throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR, "用户名或密码错误");
         }
 
         if (user.getStatus() == UserStatus.LOCKED) {
-            throw new BusinessException(ResultCode.USER_ERROR, "账号已锁定");
+            throw new BusinessException(ResultCode.ACCOUNT_LOCKED, "账号已锁定");
         }
 
         String token = JwtUtils.generateToken(user.getId(), user.getUsername());
@@ -140,7 +140,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserProfileVO getProfile(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "用户不存在");
+            throw new BusinessException(ResultCode.USER_NOT_FOUND, "用户不存在");
         }
 
         String avatarSignedUrl = null;

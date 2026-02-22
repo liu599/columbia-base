@@ -38,19 +38,19 @@ public class AdminUserController {
         // 获取当前操作用户的角色等级
         Integer currentUserRoleLevel = (Integer) httpRequest.getAttribute("roleLevel");
         if (currentUserRoleLevel == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无法获取用户权限信息");
+            throw new BusinessException(ResultCode.USER_NOT_LOGGED_IN, "无法获取用户权限信息");
         }
 
         // 验证当前用户等级 > 5
         if (currentUserRoleLevel <= MIN_MANAGE_LEVEL) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无权操作，需要等级大于5的用户权限");
+            throw new BusinessException(ResultCode.PERMISSION_DENIED, "无权操作，需要等级大于5的用户权限");
         }
 
         User user = userService.getById(request.getTargetUserId());
         if (user != null) {
             // 验证目标用户的等级不能高于当前操作用户
             if (user.getRoleLevel() != null && user.getRoleLevel() >= currentUserRoleLevel) {
-                throw new BusinessException(ResultCode.USER_ERROR, "无权修改等级高于或等于自己的用户信息");
+                throw new BusinessException(ResultCode.PERMISSION_DENIED, "无权修改等级高于或等于自己的用户信息");
             }
 
             AuditContext.setBeforeValue(user.getStatus());
@@ -71,12 +71,12 @@ public class AdminUserController {
         // 获取当前操作用户的角色等级
         Integer currentUserRoleLevel = (Integer) httpRequest.getAttribute("roleLevel");
         if (currentUserRoleLevel == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无法获取用户权限信息");
+            throw new BusinessException(ResultCode.USER_NOT_LOGGED_IN, "无法获取用户权限信息");
         }
 
         // 验证当前用户等级 > 5
         if (currentUserRoleLevel <= MIN_MANAGE_LEVEL) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无权操作，需要等级大于5的用户权限");
+            throw new BusinessException(ResultCode.PERMISSION_DENIED, "无权操作，需要等级大于5的用户权限");
         }
 
         return userService.listUsers(request);

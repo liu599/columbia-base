@@ -52,13 +52,20 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         );
 
         if (code == null) {
-            throw new BusinessException(ResultCode.INVALID_ACTIVATION_CODE, "无效的激活码");
+            throw new BusinessException(ResultCode.ACTIVATION_CODE_NOT_FOUND, "激活码不存在");
+        }
+
+        if (code.getStatus() != ActivationCodeStatus.UNUSED) {
+            throw new BusinessException(ResultCode.ACTIVATION_CODE_ALREADY_USED, "激活码已失效");
         }
 
         // Check if course exists
         Course course = courseMapper.selectById(code.getProductId());
-        if (course == null || !CourseStatus.PUBLISHED.name().equals(course.getStatus())) {
-            throw new BusinessException(ResultCode.COURSE_NOT_FOUND, "课程不存在或未发布");
+        if (course == null) {
+            throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND, "关联产品不存在");
+        }
+        if (!CourseStatus.PUBLISHED.name().equals(course.getStatus())) {
+            throw new BusinessException(ResultCode.COURSE_NOT_PUBLISHED, "课程未发布");
         }
 
         // Check if already activated
@@ -69,7 +76,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         );
 
         if (existing != null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "课程已激活");
+            throw new BusinessException(ResultCode.COURSE_ALREADY_ACTIVATED, "课程已激活");
         }
 
         // Activate course
@@ -253,7 +260,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
         // Skip progress update for assignments
         if (LessonItemType.ASSIGNMENT.name().equals(lesson.getItemType())) {
-            throw new BusinessException(ResultCode.USER_ERROR, "作业类型课时请使用提交作业接口");
+            throw new BusinessException(ResultCode.LESSON_IS_ASSIGNMENT_TYPE, "作业类型课时请使用提交作业接口");
         }
 
         UserLessonProgress progress = userLessonProgressMapper.selectOne(
@@ -299,7 +306,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
 
         if (!LessonItemType.ASSIGNMENT.name().equals(lesson.getItemType())) {
-            throw new BusinessException(ResultCode.USER_ERROR, "该课时不是作业类型");
+            throw new BusinessException(ResultCode.LESSON_NOT_ASSIGNMENT_TYPE, "该课时不是作业类型");
         }
 
         UserAssignment assignment = userAssignmentMapper.selectOne(
@@ -369,6 +376,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
 
         Lesson lesson = lessonMapper.selectById(lessonId);
+        if (lesson == null) {
+            throw new BusinessException(ResultCode.LESSON_NOT_FOUND, "课时不存在");
+        }
 
         AssignmentDetailVO vo = new AssignmentDetailVO();
         vo.setId(assignment.getId());
@@ -429,7 +439,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         try {
             LessonItemType.valueOf(request.getItemType());
         } catch (IllegalArgumentException e) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无效的课时类型");
+            throw new BusinessException(ResultCode.LESSON_TYPE_INVALID, "无效的课时类型");
         }
 
         // Validate content payload based on item type
@@ -548,7 +558,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     public AdminUserCourseVO getUserCourses(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "用户不存在");
+            throw new BusinessException(ResultCode.USER_NOT_FOUND, "用户不存在");
         }
 
         List<UserCourse> userCourses = userCourseMapper.selectList(
@@ -588,7 +598,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         );
 
         if (userCourse == null) {
-            throw new BusinessException(ResultCode.COURSE_NOT_ACTIVATED, "课程激活记录不存在");
+            throw new BusinessException(ResultCode.COURSE_ACTIVATION_RECORD_NOT_FOUND, "课程激活记录不存在");
         }
 
         if (request.getAccessStatus() != null) {
@@ -701,7 +711,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     private void validateContentPayload(String itemType, Map<String, Object> contentPayload) {
         if (contentPayload == null || contentPayload.isEmpty()) {
-            throw new BusinessException(ResultCode.USER_ERROR, "内容数据不能为空");
+            throw new BusinessException(ResultCode.LESSON_CONTENT_EMPTY, "内容数据不能为空");
         }
 
         LessonItemType type = LessonItemType.valueOf(itemType);
@@ -709,27 +719,27 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         switch (type) {
             case VIDEO:
                 if (!contentPayload.containsKey("fileUrl")) {
-                    throw new BusinessException(ResultCode.USER_ERROR, "视频课时必须包含fileUrl");
+                    throw new BusinessException(ResultCode.LESSON_CONTENT_MISSING_REQUIRED_FIELD, "视频课时必须包含fileUrl");
                 }
                 break;
             case DOCUMENT:
                 if (!contentPayload.containsKey("fileUrl")) {
-                    throw new BusinessException(ResultCode.USER_ERROR, "文档课时必须包含fileUrl");
+                    throw new BusinessException(ResultCode.LESSON_CONTENT_MISSING_REQUIRED_FIELD, "文档课时必须包含fileUrl");
                 }
                 break;
             case PODCAST:
                 if (!contentPayload.containsKey("fileUrl")) {
-                    throw new BusinessException(ResultCode.USER_ERROR, "播客课时必须包含fileUrl");
+                    throw new BusinessException(ResultCode.LESSON_CONTENT_MISSING_REQUIRED_FIELD, "播客课时必须包含fileUrl");
                 }
                 break;
             case ASSIGNMENT:
                 if (!contentPayload.containsKey("description")) {
-                    throw new BusinessException(ResultCode.USER_ERROR, "作业课时必须包含description");
+                    throw new BusinessException(ResultCode.LESSON_CONTENT_MISSING_REQUIRED_FIELD, "作业课时必须包含description");
                 }
                 break;
             case INTERACTIVE:
                 if (!contentPayload.containsKey("content")) {
-                    throw new BusinessException(ResultCode.USER_ERROR, "交互课时必须包含content");
+                    throw new BusinessException(ResultCode.LESSON_CONTENT_MISSING_REQUIRED_FIELD, "交互课时必须包含content");
                 }
                 break;
         }

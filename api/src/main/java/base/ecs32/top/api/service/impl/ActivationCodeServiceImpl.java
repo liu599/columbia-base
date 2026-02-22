@@ -61,15 +61,15 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
                 new LambdaQueryWrapper<ActivationCode>().eq(ActivationCode::getCode, code)
         );
         if (ac == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "激活码不存在");
+            throw new BusinessException(ResultCode.ACTIVATION_CODE_NOT_FOUND, "激活码不存在");
         }
         if (ac.getStatus() != ActivationCodeStatus.UNUSED) {
-            throw new BusinessException(ResultCode.USER_ERROR, "激活码已失效");
+            throw new BusinessException(ResultCode.ACTIVATION_CODE_ALREADY_USED, "激活码已失效");
         }
 
         Product product = productMapper.selectById(ac.getProductId());
         if (product == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "关联产品不存在");
+            throw new BusinessException(ResultCode.PRODUCT_NOT_ASSOCIATED, "关联产品不存在");
         }
 
         // 检查是否可以重复激活（不在白名单内的产品不能重复激活）
@@ -81,7 +81,7 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
                             .eq(ActivationCode::getStatus, ActivationCodeStatus.USED)
             );
             if (existingActivation != null) {
-                throw new BusinessException(ResultCode.USER_ERROR, "该产品您已激活，无法重复激活");
+                throw new BusinessException(ResultCode.USER_ALREADY_ACTIVATED_PRODUCT, "该产品您已激活，无法重复激活");
             }
         }
 
@@ -125,7 +125,7 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
     public void manualActivate(Long targetUserId, Long productId, String remark) {
         Product product = productMapper.selectById(productId);
         if (product == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "产品不存在");
+            throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND, "产品不存在");
         }
 
         Integer addedCredits = product.getBaseCredits() != null ? product.getBaseCredits() : 0;
@@ -221,12 +221,12 @@ public class ActivationCodeServiceImpl implements ActivationCodeService {
         );
 
         if (activation == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "用户未激活该产品");
+            throw new BusinessException(ResultCode.USER_NOT_ACTIVATED_PRODUCT, "用户未激活该产品");
         }
 
         Product product = productMapper.selectById(productId);
         if (product == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "产品不存在");
+            throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND, "产品不存在");
         }
 
         Integer creditsToDeduct = product.getBaseCredits() != null ? product.getBaseCredits() : 0;

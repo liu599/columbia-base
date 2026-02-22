@@ -118,7 +118,7 @@ public class FileServiceImpl implements FileService {
             return toFileVO(fileEntity);
         } catch (IOException e) {
             log.error("File upload failed", e);
-            throw new BusinessException(ResultCode.SERVER_ERROR, "文件上传失败");
+            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED, "文件上传失败");
         }
     }
 
@@ -177,7 +177,7 @@ public class FileServiceImpl implements FileService {
         } else if (StringUtils.hasText(request.getOssPath())) {
             queryWrapper.eq(File::getOssPath, request.getOssPath());
         } else {
-            throw new BusinessException(ResultCode.USER_ERROR, "文件标识不能为空");
+            throw new BusinessException(ResultCode.FILE_IDENTIFIER_EMPTY, "文件标识不能为空");
         }
 
         File fileEntity = fileMapper.selectOne(queryWrapper);
@@ -192,7 +192,7 @@ public class FileServiceImpl implements FileService {
     @Transactional(rollbackFor = Exception.class)
     public void updateFileMetadata(FileQueryRequest request) {
         if (!StringUtils.hasText(request.getFileUuid())) {
-            throw new BusinessException(ResultCode.USER_ERROR, "文件 UUID 不能为空");
+            throw new BusinessException(ResultCode.FILE_UUID_EMPTY, "文件 UUID 不能为空");
         }
 
         File fileEntity = fileMapper.selectOne(new LambdaQueryWrapper<File>()

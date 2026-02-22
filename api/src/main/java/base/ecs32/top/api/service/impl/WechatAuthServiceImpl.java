@@ -78,7 +78,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
 
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new BusinessException(ResultCode.SERVER_ERROR, "获取微信access_token失败");
+            throw new BusinessException(ResultCode.WECHAT_ACCESS_TOKEN_FAILED, "获取微信access_token失败");
         }
 
         try {
@@ -89,7 +89,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             if (accessToken == null || accessToken.isEmpty()) {
                 String errCode = jsonNode.path("errcode").asText();
                 String errMsg = jsonNode.path("errmsg").asText();
-                throw new BusinessException(ResultCode.SERVER_ERROR,
+                throw new BusinessException(ResultCode.WECHAT_API_ERROR,
                         "获取微信access_token失败: " + errCode + " - " + errMsg);
             }
 
@@ -98,7 +98,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             return accessToken;
 
         } catch (Exception e) {
-            throw new BusinessException(ResultCode.SERVER_ERROR, "解析微信access_token响应失败");
+            throw new BusinessException(ResultCode.WECHAT_PARSE_RESPONSE_FAILED, "解析微信access_token响应失败");
         }
     }
 
@@ -107,7 +107,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
     public Map<String, String> getWxacode(String token) {
         if (wechatConfig.getQrcodeWhitelist() == null ||
                 !wechatConfig.getQrcodeWhitelist().contains(token)) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无权限访问");
+            throw new BusinessException(ResultCode.WECHAT_QRCODE_NO_PERMISSION, "无权限访问");
         }
 
         String accessToken = getAccessToken();
@@ -142,7 +142,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             log.info("Wechat wxacode response content-type: {}", response.getHeaders().getContentType());
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new BusinessException(ResultCode.SERVER_ERROR, "获取小程序码失败");
+                throw new BusinessException(ResultCode.WECHAT_WXACODE_FAILED, "获取小程序码失败");
             }
 
             // 检查返回的是 JSON 错误还是图片字节
@@ -156,10 +156,10 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
                     JsonNode jsonNode = objectMapper.readTree(responseBody);
                     String errCode = jsonNode.path("errcode").asText();
                     String errMsg = jsonNode.path("errmsg").asText();
-                    throw new BusinessException(ResultCode.SERVER_ERROR,
+                    throw new BusinessException(ResultCode.WECHAT_API_ERROR,
                             "获取小程序码失败: " + errCode + " - " + errMsg);
                 } catch (Exception e) {
-                    throw new BusinessException(ResultCode.SERVER_ERROR, "获取小程序码失败: " + responseBody);
+                    throw new BusinessException(ResultCode.WECHAT_WXACODE_FAILED, "获取小程序码失败: " + responseBody);
                 }
             }
 
@@ -167,7 +167,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             ResponseEntity<byte[]> byteResponse = restTemplate.exchange(url, HttpMethod.POST, entity, byte[].class);
             byte[] body = byteResponse.getBody();
             if (body == null || body.length == 0) {
-                throw new BusinessException(ResultCode.SERVER_ERROR, "获取小程序码失败，返回为空");
+                throw new BusinessException(ResultCode.WECHAT_WXACODE_FAILED, "获取小程序码失败，返回为空");
             }
             log.info("Wechat wxacode response body length: {}", body.length);
 
@@ -184,7 +184,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             return result;
 
         } catch (Exception e) {
-            throw new BusinessException(ResultCode.SERVER_ERROR, "获取小程序码失败: " + e.getMessage());
+            throw new BusinessException(ResultCode.WECHAT_WXACODE_FAILED, "获取小程序码失败: " + e.getMessage());
         }
     }
 
@@ -192,7 +192,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
     public String refreshAccessToken(String token) {
         if (wechatConfig.getQrcodeWhitelist() == null ||
                 !wechatConfig.getQrcodeWhitelist().contains(token)) {
-            throw new BusinessException(ResultCode.USER_ERROR, "无权限访问");
+            throw new BusinessException(ResultCode.WECHAT_QRCODE_NO_PERMISSION, "无权限访问");
         }
 
         // 先删除 Redis 中的缓存的 token
@@ -209,11 +209,11 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
                 new LambdaQueryWrapper<WechatAuth>().eq(WechatAuth::getScene, sceneId));
 
         if (wechatAuth == null) {
-            throw new BusinessException(ResultCode.USER_ERROR, "二维码不存在");
+            throw new BusinessException(ResultCode.WECHAT_QRCODE_NOT_FOUND, "二维码不存在");
         }
 
         if (wechatAuth.getExpiredAt().isBefore(LocalDateTime.now())) {
-            throw new BusinessException(ResultCode.USER_ERROR, "二维码已过期");
+            throw new BusinessException(ResultCode.WECHAT_QRCODE_EXPIRED, "二维码已过期");
         }
 
         try {
@@ -226,7 +226,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new BusinessException(ResultCode.SERVER_ERROR, "微信登录失败");
+                throw new BusinessException(ResultCode.WECHAT_LOGIN_FAILED, "微信登录失败");
             }
 
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
@@ -235,7 +235,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
 
             if (openid == null || openid.isEmpty() || !errCode.isEmpty()) {
                 String errMsg = jsonNode.path("errmsg").asText();
-                throw new BusinessException(ResultCode.USER_ERROR,
+                throw new BusinessException(ResultCode.WECHAT_LOGIN_FAILED,
                         "登录失败: " + errCode + " - " + errMsg);
             }
 
@@ -253,7 +253,7 @@ public class WechatAuthServiceImpl extends ServiceImpl<WechatAuthMapper, WechatA
             }
 
         } catch (Exception e) {
-            throw new BusinessException(ResultCode.SERVER_ERROR, "解析微信登录响应失败");
+            throw new BusinessException(ResultCode.WECHAT_PARSE_RESPONSE_FAILED, "解析微信登录响应失败");
         }
     }
 

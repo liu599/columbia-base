@@ -42,7 +42,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
         // Reusing USER_ERROR or we could add a specific FORBIDDEN error
-        ResultVo<Object> resultVo = ResultVo.fail(ResultCode.USER_ERROR);
+        ResultVo<Object> resultVo = ResultVo.fail(ResultCode.PERMISSION_DENIED);
         resultVo.setMessage("无权访问管理接口，需要内部管理用户及以上权限");
         response.getWriter().write(new ObjectMapper().writeValueAsString(resultVo));
         return false;
