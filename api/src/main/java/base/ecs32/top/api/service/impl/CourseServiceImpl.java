@@ -4,9 +4,10 @@ import base.ecs32.top.api.advice.BusinessException;
 import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.*;
 import base.ecs32.top.api.service.CourseService;
-import base.ecs32.top.api.util.OssUtils;
+import base.ecs32.top.api.service.FileService;
 import base.ecs32.top.api.vo.*;
 import base.ecs32.top.dao.*;
+import base.ecs32.top.entity.File;
 import base.ecs32.top.entity.*;
 import base.ecs32.top.enums.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -33,7 +34,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final UserAssignmentMapper userAssignmentMapper;
     private final ActivationCodeMapper activationCodeMapper;
     private final UserMapper userMapper;
-    private final OssUtils ossUtils;
+    private final FileService fileService;
     private final ObjectMapper objectMapper;
 
     private static final long PRE_SIGNED_URL_EXPIRATION = 3600; // 1 hour
@@ -665,27 +666,19 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private Map<String, Object> generatePresignedUrls(Map<String, Object> contentPayload) {
         Map<String, Object> result = new HashMap<>(contentPayload);
 
-        if (result.containsKey("fileUrl")) {
-            String fileUrl = (String) result.get("fileUrl");
+        // 根据 fileId 获取带签名的 URL
+        if (result.containsKey("fileId")) {
+            String fileId = (String) result.get("fileId");
             try {
-                result.put("presignedUrl", ossUtils.generatePresignedUrlFromFullUrl(fileUrl, PRE_SIGNED_URL_EXPIRATION));
+                FileQueryRequest request = new FileQueryRequest();
+                request.setFileUuid(fileId);
+                FileVO fileVO = fileService.getFile(request);
+                result.put("signedUrl", fileVO.getSignedUrl());
+                result.put("fileName", fileVO.getFileName());
+                result.put("contentType", fileVO.getContentType());
             } catch (Exception e) {
-                // Fallback to original URL
+                // 如果文件不存在，保留原始 fileId
             }
-        }
-
-        if (result.containsKey("fileUrls")) {
-            @SuppressWarnings("unchecked")
-            List<String> fileUrls = (List<String>) result.get("fileUrls");
-            List<String> presignedUrls = new ArrayList<>();
-            for (String fileUrl : fileUrls) {
-                try {
-                    presignedUrls.add(ossUtils.generatePresignedUrlFromFullUrl(fileUrl, PRE_SIGNED_URL_EXPIRATION));
-                } catch (Exception e) {
-                    presignedUrls.add(fileUrl);
-                }
-            }
-            result.put("presignedUrls", presignedUrls);
         }
 
         return result;
