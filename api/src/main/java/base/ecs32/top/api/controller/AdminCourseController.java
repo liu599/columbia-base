@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -77,7 +78,11 @@ public class AdminCourseController {
     public Map<String, Object> getPresignedUrl(
             @RequestParam(value = "objectName") String objectName,
             @RequestParam(value = "contentType", required = false) String contentType) {
-        return ossUtils.getUploadCredentials(objectName, contentType, 3600);
+        // 注意：此方法需要 OssUtils 支持 generateUploadPresignedUrl
+        // 当前简化版本返回错误提示
+        Map<String, Object> result = new HashMap<>();
+        result.put("error", "请使用文件上传接口 /api/v1/file/upload 直接上传文件");
+        return result;
     }
 
     /**
