@@ -5,6 +5,10 @@ import base.ecs32.top.api.aspect.AuditContext;
 import base.ecs32.top.api.advice.BusinessException;
 import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.ProductActivateRequest;
+import base.ecs32.top.api.dto.ProductCourseTreeQueryRequest;
+import base.ecs32.top.api.dto.ProductCourseTreeQueryResponse;
+import base.ecs32.top.api.dto.ProductCourseTreeRequest;
+import base.ecs32.top.api.dto.ProductCourseTreeResponse;
 import base.ecs32.top.api.dto.ProductSaveRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
 import base.ecs32.top.api.service.CourseService;
@@ -82,9 +86,30 @@ public class AdminProductController {
     }
 
     /**
-     * 根据产品ID查询关联的课程列表
+     * 产品课程树形结构API - 创建或更新整个课程结构
+     * 支持创建新产品、更新现有产品及其课程-章节-课时树形结构
+     */
+    @PostMapping("/tree")
+    public ProductCourseTreeResponse saveProductCourseTree(
+            @RequestBody ProductCourseTreeRequest request) {
+        return productService.saveProductCourseTree(request);
+    }
+
+    /**
+     * 根据产品ID查询关联的课程树形结构
+     * 支持不同层级：TITLES_ONLY, BASIC, FULL
+     */
+    @PostMapping("/courses/query")
+    public ProductCourseTreeQueryResponse getProductCourseTree(
+            @RequestBody ProductCourseTreeQueryRequest request) {
+        return productService.getProductCourseTree(request);
+    }
+
+    /**
+     * 根据产品ID查询关联的课程列表（原接口，保留兼容性）
      */
     @GetMapping("/{product_id}/courses")
+    @Deprecated
     public Map<String, Object> getCoursesByProductId(@PathVariable("product_id") Long productId) {
         // 验证产品是否存在
         Product product = productService.getById(productId);
