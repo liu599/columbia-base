@@ -11,7 +11,7 @@ public class AdminUserCourseVO {
 }
 
 @Data
-class CourseProgressVO {
+public class CourseProgressVO {
     private Long courseId;
     private String courseTitle;
     private String accessStatus;

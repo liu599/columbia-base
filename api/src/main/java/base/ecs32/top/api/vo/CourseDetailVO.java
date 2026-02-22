@@ -15,7 +15,7 @@ public class CourseDetailVO {
 }
 
 @Data
-class ChapterLessonsVO {
+public class ChapterLessonsVO {
     private Long id;
     private String title;
     private Integer sortOrder;
@@ -23,10 +23,10 @@ class ChapterLessonsVO {
 }
 
 @Data
-class LessonSimpleVO {
+public class LessonSimpleVO {
     private Long id;
     private String title;
     private String itemType;
     private Boolean isRequired;
-    private String status; // 学习状态
+    private String status;
 }
