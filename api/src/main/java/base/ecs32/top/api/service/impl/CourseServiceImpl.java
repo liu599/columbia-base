@@ -13,6 +13,7 @@ import base.ecs32.top.enums.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -245,7 +246,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         vo.setContentPayload(contentPayload);
         vo.setSecurityConfig(buildSecurityConfig(lesson.getItemType()));
         vo.setStatus(progress != null ? progress.getStatus() : LessonProgressStatus.LOCKED.name());
-        vo.setProgressPayload(progress != null ? parseJsonPayload(progress.getProgressPayload()) : new HashMap<>());
+        vo.setProgressPayload(progress != null ? parseJsonPayload(progress.getProgressPayload()) : new HashMap<String, Object>());
 
         return vo;
     }
@@ -653,12 +654,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     private Map<String, Object> parseJsonPayload(String json) {
         if (json == null || json.isEmpty()) {
-            return new HashMap<>();
+            return new HashMap<String, Object>();
         }
         try {
-            return objectMapper.readValue(json, Map.class);
+            return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
-            return new HashMap<>();
+            return new HashMap<String, Object>();
         }
     }
 
@@ -674,7 +675,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     private Map<String, Object> generatePresignedUrls(Map<String, Object> contentPayload) {
-        Map<String, Object> result = new HashMap<>(contentPayload);
+        Map<String, Object> result = new HashMap<String, Object>(contentPayload);
 
         // 根据 fileId 获取带签名的 URL
         if (result.containsKey("fileId")) {
@@ -695,7 +696,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     private Map<String, Object> buildSecurityConfig(String itemType) {
-        Map<String, Object> config = new HashMap<>();
+        Map<String, Object> config = new HashMap<String, Object>();
         config.put("disableCopy", true);
         config.put("disableDownload", true);
         config.put("watermark", true);
