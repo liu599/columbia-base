@@ -15,6 +15,36 @@
       "key": "token",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "courseId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "chapterId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "lessonId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "assignmentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "1",
+      "type": "string"
     }
   ],
   "item": [
@@ -264,14 +294,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": null,\n  \"title\": \"Java 架构师课程\",\n  \"description\": \"从入门到精通的 Java 架构师课程\",\n  \"status\": \"PUBLISHED\"\n}"
+              "raw": "{\n  \"id\": null,\n  \"title\": \"Java 架构师课程\",\n  \"description\": \"从入门到精通的 Java 架构师课程\",\n  \"status\": \"PUBLISHED\",\n  \"productId\": {{productId}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/courses",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "admin", "courses"]
             },
-            "description": "创建或更新课程基础元数据"
+            "description": "创建或更新课程基础元数据，支持指定关联的产品ID"
           }
         },
         {
@@ -448,6 +478,81 @@
               "path": ["api", "v1", "admin", "users", "{{userId}}", "courses", "{{courseId}}", "access"]
             },
             "description": "人工干预学生的课程权限，如封禁或延长有效期"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - 产品管理接口",
+      "item": [
+        {
+          "name": "创建/更新产品",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"name\": \"Java 架构师套餐\",\n  \"description\": \"包含完整课程和作业的套餐\",\n  \"baseCredits\": 100,\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/save",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "save"]
+            },
+            "description": "创建或更新产品信息"
+          }
+        },
+        {
+          "name": "根据产品ID查询关联课程",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/{{productId}}/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "{{productId}}", "courses"]
+            },
+            "description": "根据产品ID查询该产品关联的所有课程列表"
+          }
+        },
+        {
+          "name": "手动激活产品",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetUserId\": {{userId}},\n  \"productId\": {{productId}},\n  \"remark\": \"人工添加权限\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "activate"]
+            },
+            "description": "无需激活码，手动为用户激活产品"
           }
         }
       ]
