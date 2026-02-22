@@ -316,14 +316,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": null,\n  \"chapterId\": {{chapterId}},\n  \"title\": \"第一节：Hello World\",\n  \"itemType\": \"VIDEO\",\n  \"isRequired\": true,\n  \"sortOrder\": 1,\n  \"contentPayload\": {\n    \"fileUrl\": \"https://example.com/video.mp4\",\n    \"duration\": 600,\n    \"thumbnail\": \"https://example.com/thumb.jpg\"\n  }\n}"
+              "raw": "{\n  \"id\": null,\n  \"chapterId\": {{chapterId}},\n  \"title\": \"第一节：Hello World\",\n  \"itemType\": \"VIDEO\",\n  \"isRequired\": true,\n  \"sortOrder\": 1,\n  \"contentPayload\": {\n    \"fileId\": \"your-file-uuid-here\",\n    \"duration\": 600\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/lessons",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "admin", "lessons"]
             },
-            "description": "创建或更新课时内容，支持 VIDEO, DOCUMENT, PODCAST, ASSIGNMENT, INTERACTIVE 类型"
+            "description": "创建或更新课时内容，支持 VIDEO, DOCUMENT, PODCAST, ASSIGNMENT, INTERACTIVE 类型。contentPayload 中的 fileId 需要先通过文件上传接口上传后获取"
           }
         },
         {
