@@ -64,11 +64,26 @@ public class JwtUtils {
         return extractExpiration(token).before(new Date());
     }
 
-    public static Boolean validateToken(String token) {
+    public static String getValidationError(String token) {
         try {
-            return !isTokenExpired(token);
+            Date expiration = extractExpiration(token);
+            boolean expired = isTokenExpired(token);
+            if (expired) {
+                return "Token 已过期 (过期时间: " + expiration + ")";
+            }
+            return null; // 无错误
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            return "签名无效";
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            return "Token 格式错误";
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return "Token 已过期 (过期时间: " + e.getClaims().getExpiration() + ")";
         } catch (Exception e) {
-            return false;
+            return "解析失败: " + e.getClass().getSimpleName();
         }
+    }
+
+    public static Boolean validateToken(String token) {
+        return getValidationError(token) == null;
     }
 }
