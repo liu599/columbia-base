@@ -35,7 +35,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/user/health",
                         "/api/v1/wechat/login",
                         "/api/v1/wechat/qrcode",
-                        "/api/v1/wechat/refresh-token"
+                        "/api/v1/wechat/refresh-token",
+                        "/api/v1/auth/check"
                 );
 
         registry.addInterceptor(adminInterceptor)
