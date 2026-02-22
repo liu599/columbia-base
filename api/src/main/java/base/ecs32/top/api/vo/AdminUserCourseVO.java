@@ -9,13 +9,3 @@ public class AdminUserCourseVO {
     private String username;
     private List<CourseProgressVO> courses;
 }
-
-@Data
-public class CourseProgressVO {
-    private Long courseId;
-    private String courseTitle;
-    private String accessStatus;
-    private Integer progressPercent;
-    private String activatedAt;
-    private String validUntil;
-}

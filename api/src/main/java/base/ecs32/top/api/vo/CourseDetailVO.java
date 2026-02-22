@@ -13,20 +13,3 @@ public class CourseDetailVO {
     private String accessStatus;
     private List<ChapterLessonsVO> chapters;
 }
-
-@Data
-public class ChapterLessonsVO {
-    private Long id;
-    private String title;
-    private Integer sortOrder;
-    private List<LessonSimpleVO> lessons;
-}
-
-@Data
-public class LessonSimpleVO {
-    private Long id;
-    private String title;
-    private String itemType;
-    private Boolean isRequired;
-    private String status;
-}
