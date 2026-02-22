@@ -20,6 +20,8 @@ public class Course {
 
     private String status;
 
+    private Long productId; // 关联的产品ID
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

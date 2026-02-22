@@ -8,4 +8,5 @@ public class AdminCourseSaveRequest {
     private String title;
     private String description;
     private String status; // DRAFT, PUBLISHED, OFFLINE
+    private Long productId; // 关联的产品ID
 }

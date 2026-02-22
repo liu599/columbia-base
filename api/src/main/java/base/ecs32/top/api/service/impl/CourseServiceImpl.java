@@ -404,6 +404,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
         course.setStatus(request.getStatus());
+        course.setProductId(request.getProductId());
         course.setCreateTime(LocalDateTime.now());
         course.setUpdateTime(LocalDateTime.now());
 

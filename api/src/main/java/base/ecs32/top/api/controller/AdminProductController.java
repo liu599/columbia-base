@@ -2,22 +2,28 @@ package base.ecs32.top.api.controller;
 
 import base.ecs32.top.api.aspect.AdminAudit;
 import base.ecs32.top.api.aspect.AuditContext;
+import base.ecs32.top.api.advice.BusinessException;
+import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.dto.ProductActivateRequest;
 import base.ecs32.top.api.dto.ProductSaveRequest;
 import base.ecs32.top.api.service.ActivationCodeService;
+import base.ecs32.top.api.service.CourseService;
 import base.ecs32.top.api.service.CreditService;
 import base.ecs32.top.api.service.ProductService;
+import base.ecs32.top.api.vo.ProductCourseVO;
+import base.ecs32.top.dao.CourseMapper;
+import base.ecs32.top.entity.Course;
 import base.ecs32.top.entity.Product;
 import base.ecs32.top.enums.AuditAction;
 import base.ecs32.top.enums.AuditModule;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/admin/product")
@@ -26,6 +32,7 @@ public class AdminProductController {
 
     private final ProductService productService;
     private final ActivationCodeService activationCodeService;
+    private final CourseMapper courseMapper;
 
     @PostMapping("/save")
     @AdminAudit(module = AuditModule.PRODUCT, action = AuditAction.SAVE_PRODUCT)
@@ -71,6 +78,41 @@ public class AdminProductController {
         data.put("user_id", request.getTargetUserId());
         data.put("product_name", product != null ? product.getName() : "Unknown");
         data.put("added_credits", product != null ? product.getBaseCredits() : 0);
+        return data;
+    }
+
+    /**
+     * 根据产品ID查询关联的课程列表
+     */
+    @GetMapping("/{product_id}/courses")
+    public Map<String, Object> getCoursesByProductId(@PathVariable("product_id") Long productId) {
+        // 验证产品是否存在
+        Product product = productService.getById(productId);
+        if (product == null) {
+            throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND, "产品不存在");
+        }
+
+        // 查询关联的课程
+        List<Course> courses = courseMapper.selectList(
+                new LambdaQueryWrapper<Course>()
+                        .eq(Course::getProductId, productId)
+        );
+
+        List<ProductCourseVO> courseList = courses.stream()
+                .map(course -> {
+                    ProductCourseVO vo = new ProductCourseVO();
+                    vo.setId(course.getId());
+                    vo.setTitle(course.getTitle());
+                    vo.setDescription(course.getDescription());
+                    vo.setStatus(course.getStatus());
+                    return vo;
+                })
+                .collect(Collectors.toList());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("product_id", productId);
+        data.put("product_name", product.getName());
+        data.put("courses", courseList);
         return data;
     }
 }
