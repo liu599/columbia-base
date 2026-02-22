@@ -5,6 +5,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.aliyun.oss.common.auth.HttpMethod;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
@@ -111,7 +112,7 @@ public class OssUtils {
         GeneratePresignedUrlRequest request =
                 new GeneratePresignedUrlRequest(bucketName, objectName);
         request.setExpiration(expiration);
-        request.setMethod(com.aliyun.oss.common.auth.HttpMethod.PUT);
+        request.setMethod(HttpMethod.PUT);
         if (contentType != null && !contentType.isEmpty()) {
             request.setContentType(contentType);
         }
