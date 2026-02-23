@@ -127,15 +127,19 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         List<ProductCourseTreeResponse.CourseData> courseDataList = new ArrayList<>();
 
         for (ProductCourseTreeRequest.CourseData requestCourse : requestCourses) {
+            // 用于跟踪本操作中创建的实体ID，避免被清理掉
+            Set<Long> createdChapterIds = new HashSet<>();
+            Set<Long> createdLessonIds = new HashSet<>();
+
             Course course = handleSingleCourse(requestCourse, productId, stats);
             ProductCourseTreeResponse.CourseData courseData = buildCourseData(course);
 
-            // 处理章节和课时层
-            handleChaptersAndLessons(requestCourse, course.getId(), courseData, stats);
+            // 处理章节和课时层（传入ID集合进行跟踪）
+            handleChaptersAndLessons(requestCourse, course.getId(), courseData, stats, createdChapterIds, createdLessonIds);
 
             // 清理旧数据（更新模式下）
             if (requestCourse.getCourseId() != null) {
-                cleanupOldEntities(requestCourse.getCourseId(), requestCourse.getChapters(), stats);
+                cleanupOldEntities(requestCourse.getCourseId(), requestCourse.getChapters(), stats, createdChapterIds, createdLessonIds);
             }
 
             courseDataList.add(courseData);
@@ -185,17 +189,22 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     private void handleChaptersAndLessons(ProductCourseTreeRequest.CourseData requestCourse, Long courseId,
                                            ProductCourseTreeResponse.CourseData courseData,
-                                           ProductCourseTreeResponse.OperationStats stats) {
+                                           ProductCourseTreeResponse.OperationStats stats,
+                                           Set<Long> createdChapterIds,
+                                           Set<Long> createdLessonIds) {
         List<ProductCourseTreeRequest.ChapterData> requestChapters = requestCourse.getChapters();
         List<ProductCourseTreeResponse.ChapterData> chaptersDataList = new ArrayList<>();
 
         for (int i = 0; i < requestChapters.size(); i++) {
             ProductCourseTreeRequest.ChapterData requestChapter = requestChapters.get(i);
             Chapter chapter = handleChapter(requestChapter, courseId, i, stats);
+            if (requestChapter.getChapterId() == null) {
+                createdChapterIds.add(chapter.getId());
+            }
             ProductCourseTreeResponse.ChapterData chapterData = buildChapterData(chapter);
 
             // 处理课时
-            handleLessons(requestChapter, chapter.getId(), chapterData, stats);
+            handleLessons(requestChapter, chapter.getId(), chapterData, stats, createdLessonIds);
 
             chaptersDataList.add(chapterData);
         }
@@ -236,13 +245,17 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     private void handleLessons(ProductCourseTreeRequest.ChapterData requestChapter, Long chapterId,
                                ProductCourseTreeResponse.ChapterData chapterData,
-                               ProductCourseTreeResponse.OperationStats stats) {
+                               ProductCourseTreeResponse.OperationStats stats,
+                               Set<Long> createdLessonIds) {
         List<ProductCourseTreeRequest.LessonData> requestLessons = requestChapter.getLessons();
         List<ProductCourseTreeResponse.LessonData> lessonsDataList = new ArrayList<>();
 
         for (int i = 0; i < requestLessons.size(); i++) {
             ProductCourseTreeRequest.LessonData requestLesson = requestLessons.get(i);
             Lesson lesson = handleLesson(requestLesson, chapterId, i, stats);
+            if (requestLesson.getLessonId() == null) {
+                createdLessonIds.add(lesson.getId());
+            }
             lessonsDataList.add(buildLessonData(lesson));
         }
 
@@ -309,7 +322,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     private void cleanupOldEntities(Long courseId, List<ProductCourseTreeRequest.ChapterData> requestChapters,
-                                     ProductCourseTreeResponse.OperationStats stats) {
+                                     ProductCourseTreeResponse.OperationStats stats,
+                                     Set<Long> createdChapterIds,
+                                     Set<Long> createdLessonIds) {
         // 获取请求中的章节ID集合
         Set<Long> requestChapterIds = requestChapters.stream()
                 .map(ProductCourseTreeRequest.ChapterData::getChapterId)
@@ -322,7 +337,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             return;
         }
 
-        // 删除未被引用的课时
+        // 删除未被引用的课时（排除本次操作刚创建的课时）
         List<Long> allChapterIdsForCourse = chapterMapper.selectList(
                 new LambdaQueryWrapper<Chapter>()
                         .eq(Chapter::getCourseId, courseId)
@@ -342,21 +357,22 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                     .collect(Collectors.toSet());
 
             for (Lesson lesson : existingLessons) {
-                if (!requestLessonIdsForChapter.contains(lesson.getId())) {
+                // 如果课时不在请求的ID集合中，且不是本次操作刚创建的，则删除
+                if (!requestLessonIdsForChapter.contains(lesson.getId()) && !createdLessonIds.contains(lesson.getId())) {
                     lessonMapper.deleteById(lesson.getId());
                     stats.setLessonsDeleted(stats.getLessonsDeleted() + 1);
                 }
             }
         }
 
-        // 删除未被引用的章节
+        // 删除未被引用的章节（排除本次操作刚创建的章节）
         List<Chapter> existingChapters = chapterMapper.selectList(
                 new LambdaQueryWrapper<Chapter>()
                         .eq(Chapter::getCourseId, courseId)
         );
 
         for (Chapter chapter : existingChapters) {
-            if (!requestChapterIds.contains(chapter.getId())) {
+            if (!requestChapterIds.contains(chapter.getId()) && !createdChapterIds.contains(chapter.getId())) {
                 // 先删除该章节下的所有课时
                 lessonMapper.delete(
                         new LambdaQueryWrapper<Lesson>()
