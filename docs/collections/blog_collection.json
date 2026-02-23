@@ -1,0 +1,480 @@
+{
+  "info": {
+    "name": "Columbia Base Blog API Collection",
+    "description": "API collection for Columbia Base backend - Blog System with Categories, Tags, and Posts",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"name\": \"技术分享\",\n  \"slug\": \"tech\",\n  \"description\": \"技术相关的文章分类\",\n  \"sortOrder\": 1,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"技术分享\",\n  \"slug\": \"tech\",\n  \"description\": \"技术相关的文章分类（已更新）\",\n  \"sortOrder\": 1,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/categories/{{category_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "categories", "{{category_id}}"],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List All Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "categories"]
+            }
+          }
+        },
+        {
+          "name": "List Active Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/categories?status=ACTIVE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "categories"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/categories/{{category_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "categories", "{{category_id}}"],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "item": [
+        {
+          "name": "Create Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"name\": \"Java\",\n  \"slug\": \"java\",\n  \"description\": \"Java相关文章标签\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/tags",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "tags"]
+            }
+          }
+        },
+        {
+          "name": "Update Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"Java\",\n  \"slug\": \"java\",\n  \"description\": \"Java相关文章标签（已更新）\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/tags",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "tags"]
+            }
+          }
+        },
+        {
+          "name": "Get Tag by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/tags/{{tag_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "tags", "{{tag_id}}"],
+              "variable": [
+                {
+                  "key": "tag_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List All Tags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/tags",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "tags"]
+            }
+          }
+        },
+        {
+          "name": "List Active Tags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/tags?status=ACTIVE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "tags"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Tag",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/tags/{{tag_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "tags", "{{tag_id}}"],
+              "variable": [
+                {
+                  "key": "tag_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"title\": \"Spring Boot 3.0 新特性介绍\",\n  \"slug\": \"spring-boot-3-new-features\",\n  \"excerpt\": \"本文介绍Spring Boot 3.0的主要新特性...\",\n  \"content\": \"# Spring Boot 3.0 新特性\\n\\nSpring Boot 3.0是第一个基于Jakarta EE 9+的版本...\",\n  \"contentHtml\": \"<h1>Spring Boot 3.0 新特性</h1><p>Spring Boot 3.0是第一个基于Jakarta EE 9+的版本...</p>\",\n  \"excerptText\": \"本文介绍Spring Boot 3.0的主要新特性...\",\n  \"contentText\": \"Spring Boot 3.0 新特性\\n\\nSpring Boot 3.0是第一个基于Jakarta EE 9+的版本...\",\n  \"coverImage\": \"https://example.com/images/spring-boot.jpg\",\n  \"authorId\": 1,\n  \"categoryId\": 1,\n  \"status\": \"PUBLISHED\",\n  \"isFeatured\": true,\n  \"tagIds\": [1, 2]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts"]
+            }
+          }
+        },
+        {
+          "name": "Create Draft Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"title\": \"草稿文章\",\n  \"slug\": \"draft-post\",\n  \"excerpt\": \"这是一篇草稿\",\n  \"content\": \"草稿内容...\",\n  \"authorId\": 1,\n  \"categoryId\": 1,\n  \"status\": \"DRAFT\",\n  \"isFeatured\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts"]
+            }
+          }
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"title\": \"Spring Boot 3.0 新特性介绍（已更新）\",\n  \"slug\": \"spring-boot-3-new-features\",\n  \"excerpt\": \"本文介绍Spring Boot 3.0的主要新特性...\",\n  \"content\": \"# Spring Boot 3.0 新特性\\n\\nSpring Boot 3.0是第一个基于Jakarta EE 9+的版本...\",\n  \"contentHtml\": \"<h1>Spring Boot 3.0 新特性</h1><p>Spring Boot 3.0是第一个基于Jakarta EE 9+的版本...</p>\",\n  \"excerptText\": \"本文介绍Spring Boot 3.0的主要新特性...\",\n  \"contentText\": \"Spring Boot 3.0 新特性\\n\\nSpring Boot 3.0是第一个基于Jakarta EE 9+的版本...\",\n  \"coverImage\": \"https://example.com/images/spring-boot.jpg\",\n  \"authorId\": 1,\n  \"categoryId\": 1,\n  \"status\": \"PUBLISHED\",\n  \"isFeatured\": true,\n  \"tagIds\": [1, 2]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts"]
+            }
+          }
+        },
+        {
+          "name": "Get Post by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/{{post_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "{{post_id}}"],
+              "variable": [
+                {
+                  "key": "post_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Post by Slug",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/slug/{{post_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "slug", "{{post_slug}}"],
+              "variable": [
+                {
+                  "key": "post_slug",
+                  "value": "spring-boot-3-new-features",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List All Posts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageNum\": 1,\n  \"pageSize\": 10,\n  \"status\": null,\n  \"categoryId\": null,\n  \"tagId\": null,\n  \"keyword\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "list"]
+            }
+          }
+        },
+        {
+          "name": "List Published Posts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageNum\": 1,\n  \"pageSize\": 10,\n  \"status\": \"PUBLISHED\",\n  \"categoryId\": null,\n  \"tagId\": null,\n  \"keyword\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "list"]
+            }
+          }
+        },
+        {
+          "name": "Search Posts by Keyword",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageNum\": 1,\n  \"pageSize\": 10,\n  \"status\": null,\n  \"categoryId\": null,\n  \"tagId\": null,\n  \"keyword\": \"Spring Boot\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "list"]
+            }
+          }
+        },
+        {
+          "name": "Filter Posts by Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageNum\": 1,\n  \"pageSize\": 10,\n  \"status\": \"PUBLISHED\",\n  \"categoryId\": 1,\n  \"tagId\": null,\n  \"keyword\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "list"]
+            }
+          }
+        },
+        {
+          "name": "Increment View Count",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/{{post_id}}/view",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "{{post_id}}", "view"],
+              "variable": [
+                {
+                  "key": "post_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Increment Like Count",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/{{post_id}}/like",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "{{post_id}}", "like"],
+              "variable": [
+                {
+                  "key": "post_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/v1/blog/posts/{{post_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "blog", "posts", "{{post_id}}"],
+              "variable": [
+                {
+                  "key": "post_id",
+                  "value": "1",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
