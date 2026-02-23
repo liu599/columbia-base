@@ -13,11 +13,21 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>base.ecs32.top</groupId>
             <artifactId>blog_core</artifactId>
+            <version>1.0-rc</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>base.ecs32.top</groupId>
+            <artifactId>api</artifactId>
             <version>1.0-rc</version>
             <scope>compile</scope>
         </dependency>
