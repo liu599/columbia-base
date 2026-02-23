@@ -401,6 +401,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         ProductCourseTreeQueryResponse response = new ProductCourseTreeQueryResponse();
         response.setProductId(product.getId());
         response.setProductName(product.getName());
+        response.setProductDescription(product.getDescription());
+        response.setProductBaseCredits(product.getBaseCredits());
+        response.setProductStatus(product.getStatus());
         response.setTreeLevel(request.getTreeLevel().name());
 
         if (request.getCourseId() != null) {

@@ -17,6 +17,21 @@
       "type": "string"
     },
     {
+      "key": "user_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_id",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "userId",
       "value": "1",
       "type": "string"
@@ -77,10 +92,22 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.collectionVariables.set('token', jsonData.data.token);",
-                  "    pm.collectionVariables.set('userId', jsonData.data.userId);",
+                  "// Save admin_token from login response",
+                  "if (pm.response.code === 200 && pm.request.url.path.join(',').includes('login')) {",
+                  "    const jsonData = pm.response.json();",
+                  "    console.log(jsonData)",
+                  "    if (jsonData.data.token && jsonData.data.userId) {",
+                  "        const userId = jsonData.data.userId;",
+                  "        const roleLevel = jsonData.data.roleLevel;",
+                  "        if (roleLevel > 5) {",
+                  "            pm.collectionVariables.set('admin_token', jsonData.data.token);",
+                  "            pm.collectionVariables.set('admin_id', userId.toString());",
+                  "            console.log('Admin token saved: ' + jsonData.data.token);",
+                  "        }",
+                  "        pm.collectionVariables.set('user_token', jsonData.data.token);",
+                  "        pm.collectionVariables.set('user_id', userId.toString());",
+                  "        console.log('User token saved: ' + jsonData.data.token);",
+                  "    }",
                   "}"
                 ]
               }
@@ -553,6 +580,110 @@
               "path": ["api", "v1", "admin", "product", "activate"]
             },
             "description": "无需激活码，手动为用户激活产品"
+          }
+        },
+        {
+          "name": "创建/更新产品课程树",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": null,\n  \"productName\": \"Python进阶课程\",\n  \"productDescription\": \"深入学习Python\",\n  \"productBaseCredits\": 100,\n  \"productStatus\": 1,\n  \"course\": {\n    \"courseId\": null,\n    \"title\": \"Python编程基础\",\n    \"description\": \"从零开始学习Python\",\n    \"status\": \"DRAFT\",\n    \"chapters\": [\n      {\n        \"chapterId\": null,\n        \"title\": \"第一章：Python简介\",\n        \"sortOrder\": 0,\n        \"lessons\": [\n          {\n            \"lessonId\": null,\n            \"title\": \"1.1 Python是什么\",\n            \"sortOrder\": 0,\n            \"itemType\": \"VIDEO\",\n            \"isRequired\": true,\n            \"contentPayload\": \"{\\\"fileId\\\": \\\"uuid-123\\\", \\\"duration\\\": 3600}\"\n          },\n          {\n            \"lessonId\": null,\n            \"title\": \"1.2 安装Python\",\n            \"sortOrder\": 1\n          }\n        ]\n      },\n      {\n        \"chapterId\": null,\n        \"title\": \"第二章：基础语法\",\n        \"sortOrder\": 1,\n        \"lessons\": [\n          {\n            \"lessonId\": null,\n            \"title\": \"2.1 变量与数据类型\",\n            \"sortOrder\": 0\n          }\n        ]\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/tree",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "tree"]
+            },
+            "description": "创建或更新产品-课程-章节-课时的完整层级结构。传ID则更新，不传ID则创建。支持混合创建和更新操作。"
+          }
+        },
+        {
+          "name": "查询产品课程树（BASIC）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"courseId\": null,\n  \"treeLevel\": \"BASIC\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/courses/query",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "courses", "query"]
+            },
+            "description": "查询产品下的所有课程树（基础信息）。treeLevel可选：TITLES_ONLY/BASIC/FULL，默认BASIC。"
+          }
+        },
+        {
+          "name": "查询产品课程树（TITLES_ONLY）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"courseId\": null,\n  \"treeLevel\": \"TITLES_ONLY\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/courses/query",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "courses", "query"]
+            },
+            "description": "查询产品下的所有课程树（仅标题，不含详细内容）"
+          }
+        },
+        {
+          "name": "查询单课程完整树（FULL）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"courseId\": {{courseId}},\n  \"treeLevel\": \"FULL\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/product/courses/query",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "product", "courses", "query"]
+            },
+            "description": "查询单个课程的完整树形结构（包含所有详细信息）。需要指定courseId和treeLevel=FULL。"
           }
         }
       ]

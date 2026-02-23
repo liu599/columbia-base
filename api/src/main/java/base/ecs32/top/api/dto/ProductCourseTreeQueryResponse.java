@@ -21,6 +21,21 @@ public class ProductCourseTreeQueryResponse {
     private String productName;
 
     /**
+     * 产品描述
+     */
+    private String productDescription;
+
+    /**
+     * 产品基础学分
+     */
+    private Integer productBaseCredits;
+
+    /**
+     * 产品状态
+     */
+    private Integer productStatus;
+
+    /**
      * 课程列表（当查询产品下所有课程时）
      */
     private List<CourseTree> courses;
