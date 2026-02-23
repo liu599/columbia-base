@@ -18,6 +18,8 @@
     <modules>
         <module>core</module>
         <module>api</module>
+        <module>blog_core</module>
+        <module>blog_api</module>
     </modules>
 
     <properties>
