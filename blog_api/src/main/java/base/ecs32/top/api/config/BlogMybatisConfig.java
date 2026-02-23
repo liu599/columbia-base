@@ -1,7 +1,5 @@
 package base.ecs32.top.api.config;
 
-import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -36,13 +34,6 @@ public class BlogMybatisConfig {
         // 设置MyBatis-Plus配置
         com.baomidou.mybatisplus.core.MybatisConfiguration configuration = new com.baomidou.mybatisplus.core.MybatisConfiguration();
         configuration.setLogImpl(org.apache.ibatis.logging.stdout.StdOutImpl.class);
-
-        // 设置DB类型
-        GlobalConfig globalConfig = new GlobalConfig();
-        GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
-        dbConfig.setType(DbType.MYSQL);
-        globalConfig.setDbConfig(dbConfig);
-        bean.setGlobalConfig(globalConfig);
 
         bean.setConfiguration(configuration);
         return bean.getObject();
