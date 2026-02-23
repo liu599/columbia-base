@@ -2,7 +2,7 @@
 
 ## 概述
 
-本文档描述了产品课程树形结构API的设计和实现，该API支持一次性创建或更新产品-课程-章节-课时的完整层级结构，同时支持查询接口返回不同层级的树形结构。
+本文档描述了产品课程树形结构API的设计和实现，该API支持一次性创建或更新产品-课程-章节-课时的完整层级结构，一个产品可包含多个课程。同时支持查询接口返回不同层级的树形结构，统一使用数组格式。
 
 ## API端点
 
@@ -29,46 +29,68 @@ POST /api/v1/admin/product/courses/query
   "productDescription": "深入学习Python", // 可选：产品描述
   "productBaseCredits": 100,      // 可选：产品基础学分
   "productStatus": 1,             // 可选：产品状态
-  "course": {                     // 必填：课程数据
-    "courseId": null,             // 可选：课程ID（更新时传入）
-    "title": "Python编程基础",     // 必填：课程标题
-    "description": "从零开始学习Python", // 可选：课程描述
-    "status": "DRAFT",            // 可选：课程状态
-    "chapters": [                 // 必填：章节列表
-      {
-        "chapterId": null,        // 可选：章节ID（更新时传入）
-        "title": "第一章：Python简介", // 必填：章节标题
-        "sortOrder": 0,           // 可选：排序序号
-        "lessons": [              // 必填：课时列表
-          {
-            "lessonId": null,     // 可选：课时ID（更新时传入）
-            "title": "1.1 Python是什么", // 必填：课时标题
-            "sortOrder": 0,       // 可选：排序序号
-            "itemType": "VIDEO",  // 可选：课时类型
-            "isRequired": true,   // 可选：是否必选
-            "contentPayload": "{\"fileId\": \"uuid-123\", \"duration\": 3600}" // 可选：内容JSON
-          },
-          {
-            "lessonId": null,
-            "title": "1.2 安装Python",
-            "sortOrder": 1
-          }
-        ]
-      },
-      {
-        "chapterId": null,
-        "title": "第二章：基础语法",
-        "sortOrder": 1,
-        "lessons": [
-          {
-            "lessonId": null,
-            "title": "2.1 变量与数据类型",
-            "sortOrder": 0
-          }
-        ]
-      }
-    ]
-  }
+  "courses": [                    // 必填：课程数组
+    {
+      "courseId": null,           // 可选：课程ID（更新时传入）
+      "title": "Python编程基础",   // 必填：课程标题
+      "description": "从零开始学习Python", // 可选：课程描述
+      "status": "DRAFT",          // 可选：课程状态
+      "chapters": [               // 必填：章节列表
+        {
+          "chapterId": null,      // 可选：章节ID（更新时传入）
+          "title": "第一章：Python简介", // 必填：章节标题
+          "sortOrder": 0,         // 可选：排序序号
+          "lessons": [            // 必填：课时列表
+            {
+              "lessonId": null,   // 可选：课时ID（更新时传入）
+              "title": "1.1 Python是什么", // 必填：课时标题
+              "sortOrder": 0,     // 可选：排序序号
+              "itemType": "VIDEO",// 可选：课时类型
+              "isRequired": true, // 可选：是否必选
+              "contentPayload": "{\"fileId\": \"uuid-123\", \"duration\": 3600}" // 可选：内容JSON
+            },
+            {
+              "lessonId": null,
+              "title": "1.2 安装Python",
+              "sortOrder": 1
+            }
+          ]
+        },
+        {
+          "chapterId": null,
+          "title": "第二章：基础语法",
+          "sortOrder": 1,
+          "lessons": [
+            {
+              "lessonId": null,
+              "title": "2.1 变量与数据类型",
+              "sortOrder": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "courseId": null,
+      "title": "Python进阶",
+      "description": "Python高级特性",
+      "status": "DRAFT",
+      "chapters": [
+        {
+          "chapterId": null,
+          "title": "第一章：装饰器",
+          "sortOrder": 0,
+          "lessons": [
+            {
+              "lessonId": null,
+              "title": "1.1 装饰器基础",
+              "sortOrder": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -189,36 +211,38 @@ POST /api/v1/admin/product/courses/query
   "productId": 123456789012345678,
   "productName": "Python进阶课程",
   "treeLevel": "FULL",
-  "course": {
-    "id": 123456789012345679,
-    "title": "Python编程基础",
-    "description": "从零开始学习Python",
-    "status": "DRAFT",
-    "productId": 123456789012345678,
-    "chapters": [
-      {
-        "id": 123456789012345680,
-        "title": "第一章：Python简介",
-        "sortOrder": 0,
-        "courseId": 123456789012345679,
-        "lessons": [
-          {
-            "id": 123456789012345681,
-            "title": "1.1 Python是什么",
-            "itemType": "VIDEO",
-            "isRequired": true,
-            "sortOrder": 0,
-            "chapterId": 123456789012345680,
-            "contentPayload": {
-              "fileId": "uuid-123",
-              "duration": 3600,
-              "format": "mp4"
+  "courses": [
+    {
+      "id": 123456789012345679,
+      "title": "Python编程基础",
+      "description": "从零开始学习Python",
+      "status": "DRAFT",
+      "productId": 123456789012345678,
+      "chapters": [
+        {
+          "id": 123456789012345680,
+          "title": "第一章：Python简介",
+          "sortOrder": 0,
+          "courseId": 123456789012345679,
+          "lessons": [
+            {
+              "id": 123456789012345681,
+              "title": "1.1 Python是什么",
+              "itemType": "VIDEO",
+              "isRequired": true,
+              "sortOrder": 0,
+              "chapterId": 123456789012345680,
+              "contentPayload": {
+                "fileId": "uuid-123",
+                "duration": 3600,
+                "format": "mp4"
+              }
             }
-          }
-        ]
-      }
-    ]
-  }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -263,45 +287,55 @@ POST /api/v1/admin/product/courses/query
     "baseCredits": 100,
     "status": 1
   },
-  "course": {
-    "id": 123456789012345679,
-    "title": "Python编程基础",
-    "description": "从零开始学习Python",
-    "status": "DRAFT",
-    "productId": 123456789012345678,
-    "chapters": [
-      {
-        "id": 123456789012345680,
-        "title": "第一章：Python简介",
-        "sortOrder": 0,
-        "courseId": 123456789012345679,
-        "lessons": [
-          {
-            "id": 123456789012345681,
-            "title": "1.1 Python是什么",
-            "itemType": "VIDEO",
-            "isRequired": true,
-            "sortOrder": 0,
-            "chapterId": 123456789012345680
-          },
-          {
-            "id": 123456789012345682,
-            "title": "1.2 安装Python",
-            "itemType": "VIDEO",
-            "isRequired": true,
-            "sortOrder": 1,
-            "chapterId": 123456789012345680
-          }
-        ]
-      }
-    ]
-  },
+  "courses": [
+    {
+      "id": 123456789012345679,
+      "title": "Python编程基础",
+      "description": "从零开始学习Python",
+      "status": "DRAFT",
+      "productId": 123456789012345678,
+      "chapters": [
+        {
+          "id": 123456789012345680,
+          "title": "第一章：Python简介",
+          "sortOrder": 0,
+          "courseId": 123456789012345679,
+          "lessons": [
+            {
+              "id": 123456789012345681,
+              "title": "1.1 Python是什么",
+              "itemType": "VIDEO",
+              "isRequired": true,
+              "sortOrder": 0,
+              "chapterId": 123456789012345680
+            },
+            {
+              "id": 123456789012345682,
+              "title": "1.2 安装Python",
+              "itemType": "VIDEO",
+              "isRequired": true,
+              "sortOrder": 1,
+              "chapterId": 123456789012345680
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 123456789012345683,
+      "title": "Python进阶",
+      "description": "Python高级特性",
+      "status": "DRAFT",
+      "productId": 123456789012345678,
+      "chapters": []
+    }
+  ],
   "operationType": "CREATE",
   "stats": {
     "productCreated": true,
     "productUpdated": false,
-    "courseCreated": true,
-    "courseUpdated": false,
+    "coursesCreated": 2,
+    "coursesUpdated": 0,
     "chaptersCreated": 2,
     "chaptersUpdated": 0,
     "chaptersDeleted": 0,
@@ -320,70 +354,133 @@ POST /api/v1/admin/product/courses/query
 
 ## 使用场景
 
-### 场景1：创建全新的产品课程树
+### 场景1：创建全新的产品课程树（单个课程）
 ```json
 {
   "productName": "Java基础课程",
   "productBaseCredits": 150,
-  "course": {
-    "title": "Java入门",
-    "status": "DRAFT",
-    "chapters": [
-      {
-        "title": "第一章：Java环境搭建",
-        "lessons": [
-          {"title": "1.1 JDK安装"}
-        ]
-      }
-    ]
-  }
+  "courses": [
+    {
+      "title": "Java入门",
+      "status": "DRAFT",
+      "chapters": [
+        {
+          "title": "第一章：Java环境搭建",
+          "lessons": [
+            {"title": "1.1 JDK安装"}
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
-### 场景2：更新现有产品的课程结构
+### 场景2：创建包含多个课程的产品
+```json
+{
+  "productName": "Java全栈套餐",
+  "productBaseCredits": 300,
+  "courses": [
+    {
+      "title": "Java入门",
+      "description": "Java基础语法",
+      "status": "PUBLISHED",
+      "chapters": [
+        {
+          "title": "第一章：Java环境",
+          "lessons": [{"title": "1.1 JDK安装"}]
+        }
+      ]
+    },
+    {
+      "title": "Spring Boot实战",
+      "description": "企业级开发实战",
+      "status": "PUBLISHED",
+      "chapters": [
+        {
+          "title": "第一章：快速入门",
+          "lessons": [{"title": "1.1 创建项目"}]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 场景3：更新现有产品的课程结构
 ```json
 {
   "productId": 123456789012345678,
-  "course": {
-    "courseId": 123456789012345679,
-    "title": "Java入门（更新版）",
-    "chapters": [
-      {
-        "chapterId": 123456789012345680,
-        "title": "第一章：Java环境搭建（更新）",
-        "lessons": [
-          {"lessonId": 123456789012345681, "title": "1.1 JDK安装（修改）"},
-          {"title": "1.2 新增课时"}  // 新增课时，没有lessonId
-        ]
-      },
-      {
-        "title": "第二章：Java语法",  // 新增章节，没有chapterId
-        "lessons": [
-          {"title": "2.1 变量与类型"}
-        ]
-      }
-    ]
-  }
+  "courses": [
+    {
+      "courseId": 123456789012345679,
+      "title": "Java入门（更新版）",
+      "chapters": [
+        {
+          "chapterId": 123456789012345680,
+          "title": "第一章：Java环境搭建（更新）",
+          "lessons": [
+            {"lessonId": 123456789012345681, "title": "1.1 JDK安装（修改）"},
+            {"title": "1.2 新增课时"}  // 新增课时，没有lessonId
+          ]
+        },
+        {
+          "title": "第二章：Java语法",  // 新增章节，没有chapterId
+          "lessons": [
+            {"title": "2.1 变量与类型"}
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
-### 场景3：仅创建标题（后续补充详细内容）
+### 场景4：仅创建标题（后续补充详细内容）
 ```json
 {
   "productName": "React进阶",
-  "course": {
-    "title": "React高级特性",
-    "chapters": [
-      {
-        "title": "第一章：Hooks",
-        "lessons": [
-          {"title": "1.1 useState"},
-          {"title": "1.2 useEffect"},
-          {"title": "1.3 useContext"}
-        ]
-      }
-    ]
-  }
+  "courses": [
+    {
+      "title": "React高级特性",
+      "chapters": [
+        {
+          "title": "第一章：Hooks",
+          "lessons": [
+            {"title": "1.1 useState"},
+            {"title": "1.2 useEffect"},
+            {"title": "1.3 useContext"}
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 场景5：为现有产品新增课程
+```json
+{
+  "productId": 123456789012345678,
+  "courses": [
+    {
+      "courseId": 123456789012345679,  // 已有课程，更新
+      "title": "Java入门",
+      "chapters": [...]
+    },
+    {
+      // 无courseId，创建新课程
+      "title": "Java并发编程",
+      "status": "DRAFT",
+      "chapters": [
+        {
+          "title": "第一章：线程基础",
+          "lessons": [{"title": "1.1 线程创建"}]
+        }
+      ]
+    }
+  ]
 }
 ```
 

@@ -64,21 +64,19 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         response.setProductId(product.getId());
         response.setProduct(buildProductInfo(product));
 
-        // 2. 处理课程层
-        Course course = handleCourse(request, product.getId(), stats);
-        ProductCourseTreeResponse.CourseData courseData = buildCourseData(course);
-        response.setCourse(courseData);
+        // 2. 处理课程层（现在是数组）
+        List<ProductCourseTreeResponse.CourseData> courseDataList = handleCourses(request.getCourses(), product.getId(), stats);
+        response.setCourses(courseDataList);
 
-        // 3. 处理章节和课时层
-        handleChaptersAndLessons(request.getCourse(), course.getId(), courseData, stats);
-
-        // 4. 清理旧数据（更新模式下）
-        if (request.getCourse() != null && request.getCourse().getCourseId() != null) {
-            cleanupOldEntities(request.getCourse().getCourseId(), request.getCourse().getChapters(), stats);
+        // 3. 设置操作类型
+        boolean isUpdate = request.getProductId() != null;
+        // 检查是否有任何课程在更新状态
+        for (ProductCourseTreeRequest.CourseData courseData : request.getCourses()) {
+            if (courseData.getCourseId() != null) {
+                isUpdate = true;
+                break;
+            }
         }
-
-        // 5. 设置操作类型
-        boolean isUpdate = request.getProductId() != null || request.getCourse().getCourseId() != null;
         response.setOperationType(isUpdate ? "UPDATE" : "CREATE");
 
         return response;
@@ -123,8 +121,31 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         return product;
     }
 
-    private Course handleCourse(ProductCourseTreeRequest request, Long productId, ProductCourseTreeResponse.OperationStats stats) {
-        ProductCourseTreeRequest.CourseData requestCourse = request.getCourse();
+    private List<ProductCourseTreeResponse.CourseData> handleCourses(List<ProductCourseTreeRequest.CourseData> requestCourses,
+                                                                    Long productId,
+                                                                    ProductCourseTreeResponse.OperationStats stats) {
+        List<ProductCourseTreeResponse.CourseData> courseDataList = new ArrayList<>();
+
+        for (ProductCourseTreeRequest.CourseData requestCourse : requestCourses) {
+            Course course = handleSingleCourse(requestCourse, productId, stats);
+            ProductCourseTreeResponse.CourseData courseData = buildCourseData(course);
+
+            // 处理章节和课时层
+            handleChaptersAndLessons(requestCourse, course.getId(), courseData, stats);
+
+            // 清理旧数据（更新模式下）
+            if (requestCourse.getCourseId() != null) {
+                cleanupOldEntities(requestCourse.getCourseId(), requestCourse.getChapters(), stats);
+            }
+
+            courseDataList.add(courseData);
+        }
+
+        return courseDataList;
+    }
+
+    private Course handleSingleCourse(ProductCourseTreeRequest.CourseData requestCourse, Long productId,
+                                     ProductCourseTreeResponse.OperationStats stats) {
         Course course;
 
         if (requestCourse.getCourseId() != null) {
@@ -133,7 +154,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             if (course == null) {
                 throw new BusinessException(ResultCode.COURSE_NOT_FOUND, "课程不存在");
             }
-            stats.setCourseUpdated(true);
+            stats.setCoursesUpdated(stats.getCoursesUpdated() + 1);
 
             // 更新字段
             course.setTitle(requestCourse.getTitle());
@@ -156,7 +177,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             course.setCreateTime(LocalDateTime.now());
             course.setUpdateTime(LocalDateTime.now());
             courseMapper.insert(course);
-            stats.setCourseCreated(true);
+            stats.setCoursesCreated(stats.getCoursesCreated() + 1);
         }
 
         return course;
@@ -295,6 +316,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
+        // 如果请求中没有任何带ID的章节（全是新建），则不需要清理旧数据
+        // 这样可以避免创建新章节后立即被删除的问题
+        if (requestChapterIds.isEmpty()) {
+            return;
+        }
+
         // 删除未被引用的课时
         List<Long> allChapterIdsForCourse = chapterMapper.selectList(
                 new LambdaQueryWrapper<Chapter>()
@@ -407,12 +434,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         response.setTreeLevel(request.getTreeLevel().name());
 
         if (request.getCourseId() != null) {
-            // 查询单个课程的完整树形结构
+            // 查询单个课程的完整树形结构，放入 courses 数组中
             Course course = courseMapper.selectById(request.getCourseId());
             if (course == null || !course.getProductId().equals(request.getProductId())) {
                 throw new BusinessException(ResultCode.COURSE_NOT_FOUND, "课程不存在或不属于该产品");
             }
-            response.setCourse(buildCourseTree(course, request.getTreeLevel()));
+            List<ProductCourseTreeQueryResponse.CourseTree> courseTrees = new ArrayList<>();
+            courseTrees.add(buildCourseTree(course, request.getTreeLevel()));
+            response.setCourses(courseTrees);
         } else {
             // 查询产品下所有课程
             List<Course> courses = courseMapper.selectList(

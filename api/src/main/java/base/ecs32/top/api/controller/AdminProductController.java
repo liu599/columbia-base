@@ -24,6 +24,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +93,7 @@ public class AdminProductController {
      */
     @PostMapping("/tree")
     public ProductCourseTreeResponse saveProductCourseTree(
-            @RequestBody ProductCourseTreeRequest request) {
+            @Valid @RequestBody ProductCourseTreeRequest request) {
         return productService.saveProductCourseTree(request);
     }
 

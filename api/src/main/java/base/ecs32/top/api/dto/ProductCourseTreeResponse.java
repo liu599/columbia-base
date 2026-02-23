@@ -21,9 +21,9 @@ public class ProductCourseTreeResponse {
     private ProductInfo product;
 
     /**
-     * 课程数据
+     * 课程列表
      */
-    private CourseData course;
+    private List<CourseData> courses;
 
     /**
      * 操作类型
@@ -81,8 +81,8 @@ public class ProductCourseTreeResponse {
         private boolean productUpdated;
 
         // 课程操作统计
-        private boolean courseCreated;
-        private boolean courseUpdated;
+        private int coursesCreated;
+        private int coursesUpdated;
 
         // 章节操作统计
         private int chaptersCreated;

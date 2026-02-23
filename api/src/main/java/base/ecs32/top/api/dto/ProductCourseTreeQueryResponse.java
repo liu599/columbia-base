@@ -36,14 +36,9 @@ public class ProductCourseTreeQueryResponse {
     private Integer productStatus;
 
     /**
-     * 课程列表（当查询产品下所有课程时）
+     * 课程列表（数组结构，支持单个或多个课程）
      */
     private List<CourseTree> courses;
-
-    /**
-     * 单个课程树（当查询特定课程时）
-     */
-    private CourseTree course;
 
     /**
      * 内容层级

@@ -12,7 +12,7 @@ POST /api/v1/admin/product/courses/query
 
 ---
 
-## 示例 1: 创建全新的产品课程树
+## 示例 1: 创建全新的产品课程树（单个课程）
 **场景**: 创建一个全新的产品（包含课程、章节、课时）
 
 ```json
@@ -21,96 +21,147 @@ POST /api/v1/admin/product/courses/query
   "productDescription": "深入学习Python高级特性",
   "productBaseCredits": 100,
   "productStatus": 1,
-  "course": {
-    "title": "Python编程进阶",
-    "description": "从基础到进阶的完整Python学习路径",
-    "status": "DRAFT",
-    "chapters": [
-      {
-        "title": "第一章：高级数据结构",
-        "sortOrder": 0,
-        "lessons": [
-          {
-            "title": "1.1 列表推导式",
-            "sortOrder": 0,
-            "itemType": "VIDEO",
-            "isRequired": true
-          },
-          {
-            "title": "1.2 生成器与迭代器",
-            "sortOrder": 1,
-            "itemType": "VIDEO",
-            "isRequired": true
-          },
-          {
-            "title": "1.3 装饰器基础",
-            "sortOrder": 2,
-            "itemType": "VIDEO",
-            "isRequired": true
-          }
-        ]
-      },
-      {
-        "title": "第二章：面向对象编程",
-        "sortOrder": 1,
-        "lessons": [
-          {
-            "title": "2.1 类与对象",
-            "sortOrder": 0,
-            "itemType": "VIDEO",
-            "isRequired": true
-          },
-          {
-            "title": "2.2 继承与多态",
-            "sortOrder": 1,
-            "itemType": "VIDEO",
-            "isRequired": true
-          }
-        ]
-      }
-    ]
-  }
+  "courses": [
+    {
+      "title": "Python编程进阶",
+      "description": "从基础到进阶的完整Python学习路径",
+      "status": "DRAFT",
+      "chapters": [
+        {
+          "title": "第一章：高级数据结构",
+          "sortOrder": 0,
+          "lessons": [
+            {
+              "title": "1.1 列表推导式",
+              "sortOrder": 0,
+              "itemType": "VIDEO",
+              "isRequired": true
+            },
+            {
+              "title": "1.2 生成器与迭代器",
+              "sortOrder": 1,
+              "itemType": "VIDEO",
+              "isRequired": true
+            },
+            {
+              "title": "1.3 装饰器基础",
+              "sortOrder": 2,
+              "itemType": "VIDEO",
+              "isRequired": true
+            }
+          ]
+        },
+        {
+          "title": "第二章：面向对象编程",
+          "sortOrder": 1,
+          "lessons": [
+            {
+              "title": "2.1 类与对象",
+              "sortOrder": 0,
+              "itemType": "VIDEO",
+              "isRequired": true
+            },
+            {
+              "title": "2.2 继承与多态",
+              "sortOrder": 1,
+              "itemType": "VIDEO",
+              "isRequired": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
 ---
 
-## 示例 2: 仅创建标题（后续补充详细内容）
+## 示例 2: 创建包含多个课程的产品
+**场景**: 创建一个产品包含多个课程（套餐）
+
+```json
+{
+  "productName": "Python全栈开发套餐",
+  "productDescription": "包含Python基础、进阶、Web开发等多门课程",
+  "productBaseCredits": 300,
+  "productStatus": 1,
+  "courses": [
+    {
+      "title": "Python编程基础",
+      "description": "Python入门课程",
+      "status": "PUBLISHED",
+      "chapters": [
+        {
+          "title": "第一章：Python简介",
+          "lessons": [{"title": "1.1 Python是什么"}]
+        }
+      ]
+    },
+    {
+      "title": "Python高级编程",
+      "description": "Python进阶课程",
+      "status": "PUBLISHED",
+      "chapters": [
+        {
+          "title": "第一章：装饰器",
+          "lessons": [{"title": "1.1 装饰器基础"}]
+        }
+      ]
+    },
+    {
+      "title": "Python Web开发",
+      "description": "Flask与Django实战",
+      "status": "DRAFT",
+      "chapters": [
+        {
+          "title": "第一章：Flask入门",
+          "lessons": [{"title": "1.1 Flask快速开始"}]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## 示例 3: 仅创建标题（后续补充详细内容）
 **场景**: 快速创建课程大纲，后续再补充课时详细内容
 
 ```json
 {
   "productName": "React前端开发",
-  "course": {
-    "title": "React高级特性",
-    "status": "DRAFT",
-    "chapters": [
-      {
-        "title": "第一章：React Hooks",
-        "lessons": [
-          {"title": "1.1 useState详解"},
-          {"title": "1.2 useEffect深度解析"},
-          {"title": "1.3 useContext与useReducer"}
-        ]
-      },
-      {
-        "title": "第二章：性能优化",
-        "lessons": [
-          {"title": "2.1 React.memo"},
-          {"title": "2.2 useCallback"},
-          {"title": "2.3 useMemo"}
-        ]
-      },
-      {
-        "title": "第三章：状态管理",
-        "lessons": [
-          {"title": "3.1 Redux Toolkit"},
-          {"title": "3.2 Zustand"},
-          {"title": "3.3 Jotai"}
-        ]
-      }
-    ]
-  }
+  "courses": [
+    {
+      "title": "React高级特性",
+      "status": "DRAFT",
+      "chapters": [
+        {
+          "title": "第一章：React Hooks",
+          "lessons": [
+            {"title": "1.1 useState详解"},
+            {"title": "1.2 useEffect深度解析"},
+            {"title": "1.3 useContext与useReducer"}
+          ]
+        },
+        {
+          "title": "第二章：性能优化",
+          "lessons": [
+            {"title": "2.1 React.memo"},
+            {"title": "2.2 useCallback"},
+            {"title": "2.3 useMemo"}
+          ]
+        },
+        {
+          "title": "第三章：状态管理",
+          "lessons": [
+            {"title": "3.1 Redux Toolkit"},
+            {"title": "3.2 Zustand"},
+            {"title": "3.3 Jotai"}
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 

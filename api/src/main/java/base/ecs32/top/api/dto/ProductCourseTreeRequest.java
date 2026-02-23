@@ -42,11 +42,11 @@ public class ProductCourseTreeRequest {
     private Integer productStatus;
 
     /**
-     * 课程数据
+     * 课程列表
      */
     @Valid
-    @NotEmpty(message = "课程不能为空")
-    private CourseData course;
+    @NotEmpty(message = "课程列表不能为空")
+    private List<CourseData> courses;
 
     /**
      * 课程数据
@@ -111,7 +111,6 @@ public class ProductCourseTreeRequest {
          * 课时列表
          */
         @Valid
-        @NotEmpty(message = "章节至少需要一个课时")
         private List<LessonData> lessons;
     }
 

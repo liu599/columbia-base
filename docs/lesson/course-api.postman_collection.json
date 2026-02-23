@@ -598,14 +598,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productId\": null,\n  \"productName\": \"Python进阶课程\",\n  \"productDescription\": \"深入学习Python\",\n  \"productBaseCredits\": 100,\n  \"productStatus\": 1,\n  \"course\": {\n    \"courseId\": null,\n    \"title\": \"Python编程基础\",\n    \"description\": \"从零开始学习Python\",\n    \"status\": \"DRAFT\",\n    \"chapters\": [\n      {\n        \"chapterId\": null,\n        \"title\": \"第一章：Python简介\",\n        \"sortOrder\": 0,\n        \"lessons\": [\n          {\n            \"lessonId\": null,\n            \"title\": \"1.1 Python是什么\",\n            \"sortOrder\": 0,\n            \"itemType\": \"VIDEO\",\n            \"isRequired\": true,\n            \"contentPayload\": \"{\\\"fileId\\\": \\\"uuid-123\\\", \\\"duration\\\": 3600}\"\n          },\n          {\n            \"lessonId\": null,\n            \"title\": \"1.2 安装Python\",\n            \"sortOrder\": 1\n          }\n        ]\n      },\n      {\n        \"chapterId\": null,\n        \"title\": \"第二章：基础语法\",\n        \"sortOrder\": 1,\n        \"lessons\": [\n          {\n            \"lessonId\": null,\n            \"title\": \"2.1 变量与数据类型\",\n            \"sortOrder\": 0\n          }\n        ]\n      }\n    ]\n  }\n}"
+              "raw": "{\n  \"productId\": null,\n  \"productName\": \"Python进阶课程\",\n  \"productDescription\": \"深入学习Python\",\n  \"productBaseCredits\": 100,\n  \"productStatus\": 1,\n  \"courses\": [\n    {\n      \"courseId\": null,\n      \"title\": \"Python编程基础\",\n      \"description\": \"从零开始学习Python\",\n      \"status\": \"DRAFT\",\n      \"chapters\": [\n        {\n          \"chapterId\": null,\n          \"title\": \"第一章：Python简介\",\n          \"sortOrder\": 0,\n          \"lessons\": [\n            {\n              \"lessonId\": null,\n              \"title\": \"1.1 Python是什么\",\n              \"sortOrder\": 0,\n              \"itemType\": \"VIDEO\",\n              \"isRequired\": true,\n              \"contentPayload\": \"{\\\"fileId\\\": \\\"uuid-123\\\", \\\"duration\\\": 3600}\"\n            },\n            {\n              \"lessonId\": null,\n              \"title\": \"1.2 安装Python\",\n              \"sortOrder\": 1\n            }\n          ]\n        },\n        {\n          \"chapterId\": null,\n          \"title\": \"第二章：基础语法\",\n          \"sortOrder\": 1,\n          \"lessons\": [\n            {\n              \"lessonId\": null,\n              \"title\": \"2.1 变量与数据类型\",\n              \"sortOrder\": 0\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"courseId\": null,\n      \"title\": \"Python进阶\",\n      \"description\": \"深入学习Python高级特性\",\n      \"status\": \"DRAFT\",\n      \"chapters\": [\n        {\n          \"chapterId\": null,\n          \"title\": \"第一章：装饰器\",\n          \"sortOrder\": 0,\n          \"lessons\": [\n            {\n              \"lessonId\": null,\n              \"title\": \"1.1 装饰器基础\",\n              \"sortOrder\": 0\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/product/tree",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "admin", "product", "tree"]
             },
-            "description": "创建或更新产品-课程-章节-课时的完整层级结构。传ID则更新，不传ID则创建。支持混合创建和更新操作。"
+            "description": "创建或更新产品-课程-章节-课时的完整层级结构。courses支持数组，一个产品可包含多个课程。传ID则更新，不传ID则创建。支持混合创建和更新操作。"
           }
         },
         {
@@ -631,7 +631,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "admin", "product", "courses", "query"]
             },
-            "description": "查询产品下的所有课程树（基础信息）。treeLevel可选：TITLES_ONLY/BASIC/FULL，默认BASIC。"
+            "description": "查询产品下的所有课程树（基础信息）。返回courses数组。treeLevel可选：TITLES_ONLY/BASIC/FULL，默认BASIC。"
           }
         },
         {
@@ -683,7 +683,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "admin", "product", "courses", "query"]
             },
-            "description": "查询单个课程的完整树形结构（包含所有详细信息）。需要指定courseId和treeLevel=FULL。"
+            "description": "查询单个课程的完整树形结构（包含所有详细信息）。需要指定courseId和treeLevel=FULL。返回courses数组（只包含该课程）。"
           }
         }
       ]
