@@ -2,22 +2,22 @@ package base.ecs32.top.api.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class TagVO {
 
-    private Long id;
+    private Integer id;
 
-    private String name;
+    private String tagId;
 
-    private String slug;
+    private String tagLink;
 
-    private String description;
+    private String tagName;
 
-    private String status;
+    private LocalDate createdAt;
 
-    private LocalDateTime createTime;
+    private LocalDate updatedAt;
 
-    private LocalDateTime updateTime;
+    private LocalDate deletedAt;
 }

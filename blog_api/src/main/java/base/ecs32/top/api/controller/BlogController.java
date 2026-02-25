@@ -23,20 +23,19 @@ public class BlogController {
         blogService.saveCategory(request);
     }
 
-    @DeleteMapping("/categories/{id}")
-    public void deleteCategory(@PathVariable("id") Long id) {
-        blogService.deleteCategory(id);
+    @DeleteMapping("/categories/{cid}")
+    public void deleteCategory(@PathVariable("cid") Integer cid) {
+        blogService.deleteCategory(cid);
     }
 
-    @GetMapping("/categories/{id}")
-    public CategoryVO getCategory(@PathVariable("id") Long id) {
-        return blogService.getCategory(id);
+    @GetMapping("/categories/{cid}")
+    public CategoryVO getCategory(@PathVariable("cid") Integer cid) {
+        return blogService.getCategory(cid);
     }
 
     @GetMapping("/categories")
-    public List<CategoryVO> listCategories(
-            @RequestParam(value = "status", required = false) String status) {
-        return blogService.listCategories(status);
+    public List<CategoryVO> listCategories() {
+        return blogService.listCategories();
     }
 
     // ========== Tag Endpoints ==========
@@ -47,19 +46,18 @@ public class BlogController {
     }
 
     @DeleteMapping("/tags/{id}")
-    public void deleteTag(@PathVariable("id") Long id) {
+    public void deleteTag(@PathVariable("id") Integer id) {
         blogService.deleteTag(id);
     }
 
     @GetMapping("/tags/{id}")
-    public TagVO getTag(@PathVariable("id") Long id) {
+    public TagVO getTag(@PathVariable("id") Integer id) {
         return blogService.getTag(id);
     }
 
     @GetMapping("/tags")
-    public List<TagVO> listTags(
-            @RequestParam(value = "status", required = false) String status) {
-        return blogService.listTags(status);
+    public List<TagVO> listTags() {
+        return blogService.listTags();
     }
 
     // ========== Post Endpoints ==========
@@ -69,29 +67,19 @@ public class BlogController {
         blogService.savePost(request);
     }
 
-    @DeleteMapping("/posts/{id}")
-    public void deletePost(@PathVariable("id") Long id) {
-        blogService.deletePost(id);
+    @DeleteMapping("/posts/{pid}")
+    public void deletePost(@PathVariable("pid") Integer pid) {
+        blogService.deletePost(pid);
     }
 
-    @GetMapping("/posts/{id}")
-    public PostVO getPost(@PathVariable("id") Long id) {
-        return blogService.getPost(id);
+    @GetMapping("/posts/{pid}")
+    public PostVO getPost(@PathVariable("pid") Integer pid) {
+        return blogService.getPost(pid);
     }
 
     @GetMapping("/posts/slug/{slug}")
     public PostVO getPostBySlug(@PathVariable("slug") String slug) {
         return blogService.getPostBySlug(slug);
-    }
-
-    @PostMapping("/posts/{id}/view")
-    public void incrementViewCount(@PathVariable("id") Long id) {
-        blogService.incrementViewCount(id);
-    }
-
-    @PostMapping("/posts/{id}/like")
-    public void incrementLikeCount(@PathVariable("id") Long id) {
-        blogService.incrementLikeCount(id);
     }
 
     @PostMapping("/posts/list")

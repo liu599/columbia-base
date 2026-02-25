@@ -5,24 +5,24 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
-@TableName("t_blog_tag")
+@TableName("tag")
 public class Tag {
 
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
-    private String name;
+    private String tagId;
 
-    private String slug;
+    private String tagLink;
 
-    private String description;
+    private String tagName;
 
-    private String status;
+    private LocalDate createdAt;
 
-    private LocalDateTime createTime;
+    private LocalDate updatedAt;
 
-    private LocalDateTime updateTime;
+    private LocalDate deletedAt;
 }

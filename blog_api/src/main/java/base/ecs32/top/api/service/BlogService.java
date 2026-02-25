@@ -10,33 +10,29 @@ public interface BlogService {
     // Category methods
     void saveCategory(CategorySaveRequest request);
 
-    void deleteCategory(Long id);
+    void deleteCategory(Integer cid);
 
-    CategoryVO getCategory(Long id);
+    CategoryVO getCategory(Integer cid);
 
-    List<CategoryVO> listCategories(String status);
+    List<CategoryVO> listCategories();
 
     // Tag methods
     void saveTag(TagSaveRequest request);
 
-    void deleteTag(Long id);
+    void deleteTag(Integer id);
 
-    TagVO getTag(Long id);
+    TagVO getTag(Integer id);
 
-    List<TagVO> listTags(String status);
+    List<TagVO> listTags();
 
     // Post methods
     void savePost(PostSaveRequest request);
 
-    void deletePost(Long id);
+    void deletePost(Integer pid);
 
-    PostVO getPost(Long id);
+    PostVO getPost(Integer pid);
 
     PostVO getPostBySlug(String slug);
-
-    void incrementViewCount(Long postId);
-
-    void incrementLikeCount(Long postId);
 
     PageResponse<PostVO> listPosts(PostListRequest request);
 }
