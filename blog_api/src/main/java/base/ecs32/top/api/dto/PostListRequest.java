@@ -9,11 +9,7 @@ public class PostListRequest {
 
     private Integer pageSize = 10;
 
-    private String status;
-
-    private Long categoryId;
-
-    private Long tagId;
+    private String category;
 
     private String keyword;
 }

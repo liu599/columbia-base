@@ -1,30 +1,26 @@
 package base.ecs32.top.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
-@TableName("t_blog_category")
+@TableName("category")
 public class Category {
 
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+    @TableId(value = "cid", type = IdType.AUTO)
+    private Integer cid;
 
-    private String name;
+    private String id;
 
-    private String slug;
+    @TableField("cname")
+    private String cname;
 
-    private String description;
+    @TableField("clink")
+    private String clink;
 
-    private Integer sortOrder;
-
-    private String status;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
+    @TableField("cinfo")
+    private String cinfo;
 }

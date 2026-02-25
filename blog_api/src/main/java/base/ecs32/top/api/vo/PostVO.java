@@ -2,53 +2,26 @@ package base.ecs32.top.api.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 public class PostVO {
 
-    private Long id;
+    private Integer pid;
 
-    private String title;
+    private String poid;
+
+    private String author;
+
+    private String category;
+
+    private String body;
+
+    private String ptitle;
 
     private String slug;
 
-    private String excerpt;
+    private String password;
 
-    private String content;
+    private Long createdAt;
 
-    private String contentHtml;
-
-    private String excerptText;
-
-    private String contentText;
-
-    private String coverImage;
-
-    private Long authorId;
-
-    private String authorName;
-
-    private Long categoryId;
-
-    private String categoryName;
-
-    private List<TagVO> tags;
-
-    private String status;
-
-    private Integer viewCount;
-
-    private Integer likeCount;
-
-    private Integer commentCount;
-
-    private Boolean isFeatured;
-
-    private LocalDateTime publishedAt;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
+    private Long modifiedAt;
 }

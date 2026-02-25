@@ -2,24 +2,16 @@ package base.ecs32.top.api.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
 public class CategoryVO {
 
-    private Long id;
+    private Integer cid;
 
-    private String name;
+    private String id;
 
-    private String slug;
+    private String cname;
 
-    private String description;
+    private String clink;
 
-    private Integer sortOrder;
-
-    private String status;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
+    private String cinfo;
 }

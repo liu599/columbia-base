@@ -12,34 +12,39 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final AuthInterceptor authInterceptor;
-    private final AdminInterceptor adminInterceptor;
+  private final AuthInterceptor authInterceptor;
+  private final AdminInterceptor adminInterceptor;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
-    }
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+      .allowedOriginPatterns("*")
+      .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+      .allowedHeaders("*")
+      .allowCredentials(true)
+      .maxAge(3600);
+  }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/api/v1/user/register",
-                        "/api/v1/user/login",
-                        "/api/v1/user/health",
-                        "/api/v1/wechat/login",
-                        "/api/v1/wechat/qrcode",
-                        "/api/v1/wechat/refresh-token",
-                        "/api/v1/auth/check"
-                );
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(authInterceptor)
+      .addPathPatterns("/**")
+      .excludePathPatterns(
+        "/api/v1/user/register",
+        "/api/v1/user/login",
+        "/api/v1/user/health",
+        "/api/v1/wechat/login",
+        "/api/v1/wechat/qrcode",
+        "/api/v1/wechat/refresh-token",
+        "/api/v1/auth/check",
+        "/api/v1/blog/categories",
+        "/api/v1/blog/tags",
+        "/api/v1/blog/posts/list",
+        "/api/v1/blog/posts/**",
+        "/api/v1/blog/posts/slug/**"
+      );
 
-        registry.addInterceptor(adminInterceptor)
-                .addPathPatterns("/api/v1/admin/**");
-    }
+    registry.addInterceptor(adminInterceptor)
+      .addPathPatterns("/api/v1/admin/**");
+  }
 }

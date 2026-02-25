@@ -32,6 +32,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>base.ecs32.top</groupId>
+            <artifactId>blog_api</artifactId>
+            <version>1.0-rc</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>

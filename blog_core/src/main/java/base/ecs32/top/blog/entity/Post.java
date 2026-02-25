@@ -1,52 +1,35 @@
 package base.ecs32.top.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
-@TableName("t_blog_post")
+@TableName("post")
 public class Post {
 
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+    @TableId(value = "pid", type = IdType.AUTO)
+    private Integer pid;
 
-    private String title;
+    private String poid;
+
+    private String author;
+
+    private String category;
+
+    private String body;
+
+    private String ptitle;
 
     private String slug;
 
-    private String excerpt;
+    private String password;
 
-    private String content;
+    @TableField("createdAt")
+    private Long createdAt;
 
-    private String contentHtml;
-
-    private String excerptText;
-
-    private String contentText;
-
-    private String coverImage;
-
-    private Long authorId;
-
-    private Long categoryId;
-
-    private String status;
-
-    private Integer viewCount;
-
-    private Integer likeCount;
-
-    private Integer commentCount;
-
-    private Boolean isFeatured;
-
-    private LocalDateTime publishedAt;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
+    @TableField("modifiedAt")
+    private Long modifiedAt;
 }
