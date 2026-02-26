@@ -28,6 +28,8 @@ public interface BlogService {
     // Post methods
     void savePost(PostSaveRequest request);
 
+    void updatePost(PostSaveRequest request);
+
     void deletePost(Integer pid);
 
     PostVO getPost(Integer pid);
