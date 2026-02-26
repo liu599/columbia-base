@@ -10,9 +10,7 @@
       "Bash(dir C:\\\\Project\\\\columbia-base:*)",
       "Bash(python:*)",
       "Bash(git:*)",
-      "Bash(find \"C:/Project/columbia-base\" -type f -name \"*.java\" | xargs grep -l \"import.*PostTag\\\\|PostTag\\\\|postTag\" 2>/dev/null)",
-      "Bash(mysql:*)",
-      "Bash(mvn compile:*)"
+      "Bash(find \"C:/Project/columbia-base\" -type f -name \"*.java\" | xargs grep -l \"import.*PostTag\\\\|PostTag\\\\|postTag\" 2>/dev/null)"
     ]
   }
 }
