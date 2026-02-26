@@ -16,4 +16,5 @@ public interface UserService extends IService<User> {
     UserLoginVO login(UserLoginRequest request, String ip);
     UserProfileVO getProfile(Long userId);
     PageResponse<UserListVO> listUsers(SearchRequest request);
+    void logout(String token);
 }

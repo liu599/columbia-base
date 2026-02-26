@@ -1,5 +1,6 @@
 package base.ecs32.top.api.controller;
 
+import base.ecs32.top.api.advice.ResultVo;
 import base.ecs32.top.api.dto.UserLoginRequest;
 import base.ecs32.top.api.dto.UserRegisterRequest;
 import base.ecs32.top.api.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,33 +21,41 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+  @Autowired
+  public UserController(UserService userService) {
+    this.userService = userService;
+  }
+
+  @PostMapping("/register")
+  public UserRegisterVO register(@Valid @RequestBody UserRegisterRequest request) {
+    return userService.register(request);
+  }
+
+  @PostMapping("/login")
+  public UserLoginVO login(@Valid @RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
+    return userService.login(request, httpServletRequest.getRemoteAddr());
+  }
+
+  @PostMapping("/profile")
+  public UserProfileVO profile(HttpServletRequest request) {
+    Long userId = (Long) request.getAttribute("userId");
+    return userService.getProfile(userId);
+  }
+
+  @PostMapping("/logout")
+  public ResultVo<Void> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      return ResultVo.fail("缺少有效的 token");
     }
+    String token = authHeader.substring(7);
+    userService.logout(token);
+    return ResultVo.success();
+  }
 
-    @PostMapping("/register")
-    public UserRegisterVO register(@Valid @RequestBody UserRegisterRequest request) {
-        return userService.register(request);
-    }
-
-    @PostMapping("/login")
-    public UserLoginVO login(@Valid @RequestBody UserLoginRequest request, HttpServletRequest httpServletRequest) {
-        return userService.login(request, httpServletRequest.getRemoteAddr());
-    }
-
-    @PostMapping("/profile")
-    public UserProfileVO profile(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
-        return userService.getProfile(userId);
-    }
-
-
-
-    @GetMapping("/health")
-    public String health() {
-        return "ok";
-    }
+  @GetMapping("/health")
+  public String health() {
+    return "ok";
+  }
 }
