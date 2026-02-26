@@ -51,6 +51,14 @@ public class AdminCourseController {
     }
 
     /**
+     * P0: 根据 id 获取课时内容
+     */
+    @PostMapping("/lessons/get")
+    public AdminLessonVO getLesson(@Valid @RequestBody AdminLessonGetRequest request) {
+        return courseService.getLesson(request.getId());
+    }
+
+    /**
      * P0: 分页获取待批改或所有状态的作业列表
      */
     @PostMapping("/assignments")

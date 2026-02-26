@@ -23,4 +23,5 @@ public interface CourseService {
     void gradeAssignment(Long assignmentId, Long graderId, AdminAssignmentGradeRequest request);
     AdminUserCourseVO getUserCourses(Long userId);
     void updateUserCourseAccess(Long userId, Long courseId, AdminUserCourseAccessRequest request);
+    AdminLessonVO getLesson(Long id);
 }

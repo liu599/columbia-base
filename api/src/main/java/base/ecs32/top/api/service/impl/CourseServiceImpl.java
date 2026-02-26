@@ -613,6 +613,25 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         userCourseMapper.updateById(userCourse);
     }
 
+    @Override
+    public AdminLessonVO getLesson(Long id) {
+        Lesson lesson = lessonMapper.selectById(id);
+        if (lesson == null) {
+            throw new BusinessException(ResultCode.LESSON_NOT_FOUND, "课时不存在");
+        }
+
+        AdminLessonVO vo = new AdminLessonVO();
+        vo.setId(lesson.getId());
+        vo.setChapterId(lesson.getChapterId());
+        vo.setTitle(lesson.getTitle());
+        vo.setItemType(lesson.getItemType());
+        vo.setIsRequired(lesson.getIsRequired());
+        vo.setSortOrder(lesson.getSortOrder());
+        vo.setContentPayload(parseJsonPayload(lesson.getContentPayload()));
+
+        return vo;
+    }
+
     // ==================== Helper Methods ====================
 
     private void updateCourseProgress(Long userId, Long chapterId) {
