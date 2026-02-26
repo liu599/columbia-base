@@ -105,8 +105,36 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @Transactional
     public void savePost(PostSaveRequest request) {
+        // 检查 poid 是否已存在
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getPoid, request.getPoid());
+        Post existingPost = postMapper.selectOne(queryWrapper);
+
+        if (existingPost != null) {
+            // poid 已存在，执行更新
+            updatePost(request);
+        } else {
+            // poid 不存在，执行插入
+            Post post = new Post();
+            post.setPoid(request.getPoid());
+            post.setAuthor(request.getAuthor());
+            post.setCategory(request.getCategory());
+            post.setBody(request.getBody());
+            post.setPtitle(request.getPtitle());
+            post.setSlug(request.getSlug());
+            post.setPassword(request.getPassword() != null ? request.getPassword() : "");
+
+            long now = System.currentTimeMillis() / 1000L;
+            post.setCreatedAt(now);
+            post.setModifiedAt(now);
+            postMapper.insert(post);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updatePost(PostSaveRequest request) {
         Post post = new Post();
-        post.setPid(request.getPid());
         post.setPoid(request.getPoid());
         post.setAuthor(request.getAuthor());
         post.setCategory(request.getCategory());
@@ -116,15 +144,11 @@ public class BlogServiceImpl implements BlogService {
         post.setPassword(request.getPassword() != null ? request.getPassword() : "");
 
         long now = System.currentTimeMillis() / 1000L;
+        post.setModifiedAt(now);
 
-        if (post.getPid() == null) {
-            post.setCreatedAt(now);
-            post.setModifiedAt(now);
-            postMapper.insert(post);
-        } else {
-            post.setModifiedAt(now);
-            postMapper.updateById(post);
-        }
+        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Post::getPoid, request.getPoid());
+        postMapper.update(post, wrapper);
     }
 
     @Override
