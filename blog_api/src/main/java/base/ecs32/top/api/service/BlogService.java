@@ -7,32 +7,34 @@ import java.util.List;
 
 public interface BlogService {
 
-    // Category methods
-    void saveCategory(CategorySaveRequest request);
+  // Category methods
+  void saveCategory(CategorySaveRequest request);
 
-    void deleteCategory(Integer cid);
+  void deleteCategory(Integer cid);
 
-    CategoryVO getCategory(Integer cid);
+  CategoryVO getCategory(Integer cid);
 
-    List<CategoryVO> listCategories();
+  List<CategoryVO> listCategories();
 
-    // Tag methods
-    void saveTag(TagSaveRequest request);
+  // Tag methods
+  void saveTag(TagSaveRequest request);
 
-    void deleteTag(Integer id);
+  void deleteTag(Integer id);
 
-    TagVO getTag(Integer id);
+  TagVO getTag(Integer id);
 
-    List<TagVO> listTags();
+  List<TagVO> listTags();
 
-    // Post methods
-    void savePost(PostSaveRequest request);
+  // Post methods
+  void savePost(PostSaveRequest request);
 
-    void deletePost(Integer pid);
+  void updatePost(PostSaveRequest request);
 
-    PostVO getPost(Integer pid);
+  void deletePost(Integer pid);
 
-    PostVO getPostBySlug(String slug);
+  PostVO getPost(Integer pid);
 
-    PageResponse<PostVO> listPosts(PostListRequest request);
+  PostVO getPostBySlug(String slug);
+
+  PageResponse<PostVO> listPosts(PostListRequest request);
 }

@@ -14,76 +14,81 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlogController {
 
-    private final BlogService blogService;
+  private final BlogService blogService;
 
-    // ========== Category Endpoints ==========
+  // ========== Category Endpoints ==========
 
-    @PostMapping("/categories")
-    public void saveCategory(@Valid @RequestBody CategorySaveRequest request) {
-        blogService.saveCategory(request);
-    }
+  @PostMapping("/categories")
+  public void saveCategory(@Valid @RequestBody CategorySaveRequest request) {
+    blogService.saveCategory(request);
+  }
 
-    @DeleteMapping("/categories/{cid}")
-    public void deleteCategory(@PathVariable("cid") Integer cid) {
-        blogService.deleteCategory(cid);
-    }
+  @DeleteMapping("/categories/{cid}")
+  public void deleteCategory(@PathVariable("cid") Integer cid) {
+    blogService.deleteCategory(cid);
+  }
 
-    @GetMapping("/categories/{cid}")
-    public CategoryVO getCategory(@PathVariable("cid") Integer cid) {
-        return blogService.getCategory(cid);
-    }
+  @GetMapping("/categories/{cid}")
+  public CategoryVO getCategory(@PathVariable("cid") Integer cid) {
+    return blogService.getCategory(cid);
+  }
 
-    @GetMapping("/categories")
-    public List<CategoryVO> listCategories() {
-        return blogService.listCategories();
-    }
+  @GetMapping("/categories")
+  public List<CategoryVO> listCategories() {
+    return blogService.listCategories();
+  }
 
-    // ========== Tag Endpoints ==========
+  // ========== Tag Endpoints ==========
 
-    @PostMapping("/tags")
-    public void saveTag(@Valid @RequestBody TagSaveRequest request) {
-        blogService.saveTag(request);
-    }
+  @PostMapping("/tags")
+  public void saveTag(@Valid @RequestBody TagSaveRequest request) {
+    blogService.saveTag(request);
+  }
 
-    @DeleteMapping("/tags/{id}")
-    public void deleteTag(@PathVariable("id") Integer id) {
-        blogService.deleteTag(id);
-    }
+  @DeleteMapping("/tags/{id}")
+  public void deleteTag(@PathVariable("id") Integer id) {
+    blogService.deleteTag(id);
+  }
 
-    @GetMapping("/tags/{id}")
-    public TagVO getTag(@PathVariable("id") Integer id) {
-        return blogService.getTag(id);
-    }
+  @GetMapping("/tags/{id}")
+  public TagVO getTag(@PathVariable("id") Integer id) {
+    return blogService.getTag(id);
+  }
 
-    @GetMapping("/tags")
-    public List<TagVO> listTags() {
-        return blogService.listTags();
-    }
+  @GetMapping("/tags")
+  public List<TagVO> listTags() {
+    return blogService.listTags();
+  }
 
-    // ========== Post Endpoints ==========
+  // ========== Post Endpoints ==========
 
-    @PostMapping("/posts")
-    public void savePost(@Valid @RequestBody PostSaveRequest request) {
-        blogService.savePost(request);
-    }
+  @PostMapping("/posts")
+  public void savePost(@Valid @RequestBody PostSaveRequest request) {
+    blogService.savePost(request);
+  }
 
-    @DeleteMapping("/posts/{pid}")
-    public void deletePost(@PathVariable("pid") Integer pid) {
-        blogService.deletePost(pid);
-    }
+  @PutMapping("/posts")
+  public void updatePost(@Valid @RequestBody PostSaveRequest request) {
+    blogService.updatePost(request);
+  }
 
-    @GetMapping("/posts/{pid}")
-    public PostVO getPost(@PathVariable("pid") Integer pid) {
-        return blogService.getPost(pid);
-    }
+  @DeleteMapping("/posts/{pid}")
+  public void deletePost(@PathVariable("pid") Integer pid) {
+    blogService.deletePost(pid);
+  }
 
-    @GetMapping("/posts/slug/{slug}")
-    public PostVO getPostBySlug(@PathVariable("slug") String slug) {
-        return blogService.getPostBySlug(slug);
-    }
+  @GetMapping("/posts/{pid}")
+  public PostVO getPost(@PathVariable("pid") Integer pid) {
+    return blogService.getPost(pid);
+  }
 
-    @PostMapping("/posts/list")
-    public PageResponse<PostVO> listPosts(@RequestBody PostListRequest request) {
-        return blogService.listPosts(request);
-    }
+  @GetMapping("/posts/slug/{slug}")
+  public PostVO getPostBySlug(@PathVariable("slug") String slug) {
+    return blogService.getPostBySlug(slug);
+  }
+
+  @PostMapping("/posts/list")
+  public PageResponse<PostVO> listPosts(@RequestBody PostListRequest request) {
+    return blogService.listPosts(request);
+  }
 }
