@@ -1,5 +1,6 @@
 package base.ecs32.top.api.controller;
 
+import base.ecs32.top.api.advice.ResultCode;
 import base.ecs32.top.api.advice.ResultVo;
 import base.ecs32.top.api.dto.UserLoginRequest;
 import base.ecs32.top.api.dto.UserRegisterRequest;
@@ -47,7 +48,7 @@ public class UserController {
   @PostMapping("/logout")
   public ResultVo<Void> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-      return ResultVo.fail("缺少有效的 token");
+      return ResultVo.fail(ResultCode.USER_NOT_LOGGED_IN, "缺少有效的 token");
     }
     String token = authHeader.substring(7);
     userService.logout(token);
