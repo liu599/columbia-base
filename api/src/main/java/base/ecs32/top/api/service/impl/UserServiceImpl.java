@@ -77,7 +77,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     // Check if username already exists
-    if (userMapper.selectOne(new LambdaQueryWrapper<User().eq(User::getUsername, request.getUsername())) != null) {
+    if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())) != null) {
       throw new BusinessException(ResultCode.USERNAME_ALREADY_EXISTS, "用户名已存在");
     }
 
