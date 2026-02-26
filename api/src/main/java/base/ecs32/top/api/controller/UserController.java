@@ -52,7 +52,7 @@ public class UserController {
     }
     String token = authHeader.substring(7);
     userService.logout(token);
-    return ResultVo.success();
+    return ResultVo.success(null);
   }
 
   @GetMapping("/health")
