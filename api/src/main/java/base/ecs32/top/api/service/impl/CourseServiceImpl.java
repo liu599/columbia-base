@@ -635,7 +635,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         // Generate assetMapping and embed it in contentPayload
 Map<String, String> assetMapping = generateAssetMapping(contentPayload);
 if (!assetMapping.isEmpty()) {
-contentPayload.put("assetMapping", assetMapping);
+contentPayload.put("assetsMapping", assetMapping);
 }
 
         return vo;
