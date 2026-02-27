@@ -41,7 +41,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         "/api/v1/blog/tags",
         "/api/v1/blog/posts/list",
         "/api/v1/blog/posts/**",
-        "/api/v1/blog/posts/slug/**"
+        "/api/v1/blog/posts/slug/**",
+ "/api/v1/product/public/**"
       );
 
     registry.addInterceptor(adminInterceptor)

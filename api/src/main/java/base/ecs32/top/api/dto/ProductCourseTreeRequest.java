@@ -42,6 +42,11 @@ public class ProductCourseTreeRequest {
     private Integer productStatus;
 
     /**
+     * 产品封面图文件 ID
+     */
+    private Long productCover;
+
+    /**
      * 课程列表
      */
     @Valid
@@ -75,6 +80,11 @@ public class ProductCourseTreeRequest {
          * 课程状态
          */
         private String status;
+
+        /**
+         * 课程封面图文件 ID
+         */
+        private Long cover;
 
         /**
          * 章节列表

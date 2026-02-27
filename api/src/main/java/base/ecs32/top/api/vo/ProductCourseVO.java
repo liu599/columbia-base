@@ -8,4 +8,5 @@ public class ProductCourseVO {
     private String title;
     private String description;
     private String status;
+    private String coverUrl; // 封面图临时链接
 }

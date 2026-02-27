@@ -19,4 +19,6 @@ public class Product {
     private Integer baseCredits;
 
     private Integer status;
+
+    private Long cover; // 封面图 file_id
 }

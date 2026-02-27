@@ -43,6 +43,7 @@ public class ProductCourseTreeResponse {
         private String description;
         private Integer baseCredits;
         private Integer status;
+        private Long cover; // 封面图文件 ID
     }
 
     @Data
@@ -52,6 +53,7 @@ public class ProductCourseTreeResponse {
         private String description;
         private String status;
         private Long productId;
+        private Long cover; // 封面图文件 ID
         private List<ChapterData> chapters;
     }
 
