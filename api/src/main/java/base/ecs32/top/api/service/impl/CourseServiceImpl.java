@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> implements CourseService {
@@ -36,6 +38,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final ActivationCodeMapper activationCodeMapper;
     private final UserMapper userMapper;
     private final FileService fileService;
+    private final FileMapper fileMapper;
     private final ObjectMapper objectMapper;
 
     private static final long PRE_SIGNED_URL_EXPIRATION = 3600; // 1 hour
@@ -627,7 +630,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         vo.setItemType(lesson.getItemType());
         vo.setIsRequired(lesson.getIsRequired());
         vo.setSortOrder(lesson.getSortOrder());
-        vo.setContentPayload(parseJsonPayload(lesson.getContentPayload()));
+        Map<String, Object> contentPayload = parseJsonPayload(lesson.getContentPayload());
+        vo.setContentPayload(contentPayload);
+        // Generate assetMapping and embed it in contentPayload
+Map<String, String> assetMapping = generateAssetMapping(contentPayload);
+if (!assetMapping.isEmpty()) {
+contentPayload.put("assetMapping", assetMapping);
+}
 
         return vo;
     }
@@ -766,7 +775,37 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
     }
 
-    private String formatDateTime(LocalDateTime dateTime) {
+    private Map<String, String> generateAssetMapping(Map<String, Object> contentPayload) {
+ Map<String, String> assetMapping = new HashMap<>();
+
+ // Check if contentPayload contains "assets" array
+ if (contentPayload != null && contentPayload.containsKey("assets")) {
+ Object assetsObj = contentPayload.get("assets");
+ if (assetsObj instanceof List) {
+ List<?> assets = (List<?>) assetsObj;
+ for (Object asset : assets) {
+ if (asset instanceof String) {
+ String fileUuid = (String) asset;
+ try {
+ // Look up file by fileUuid
+ FileQueryRequest request = new FileQueryRequest();
+ request.setFileUuid(fileUuid);
+ FileVO fileVO = fileService.getFile(request);
+ // Put fileUuid -> signedUrl mapping
+ assetMapping.put(fileUuid, fileVO.getSignedUrl());
+ } catch (Exception e) {
+ // If file not found or error, skip this asset
+ log.warn("Failed to generate signed URL for fileUuid: {}", fileUuid);
+ }
+ }
+ }
+ }
+ }
+
+ return assetMapping;
+ }
+
+ private String formatDateTime(LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
         }
