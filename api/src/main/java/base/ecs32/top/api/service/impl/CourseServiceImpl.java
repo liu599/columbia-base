@@ -40,6 +40,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private final FileService fileService;
     private final FileMapper fileMapper;
     private final ObjectMapper objectMapper;
+    private final ProductMapper productMapper;
 
     private static final long PRE_SIGNED_URL_EXPIRATION = 3600; // 1 hour
 
@@ -63,11 +64,24 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             throw new BusinessException(ResultCode.ACTIVATION_CODE_ALREADY_USED, "激活码已失效");
         }
 
-        // Check if course exists
-        Course course = courseMapper.selectById(code.getProductId());
-        if (course == null) {
+        // Check if product exists (TODO: 后续会更新成使用 course_id 而不是 product_id)
+        Product product = productMapper.selectById(code.getProductId());
+        if (product == null) {
             throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND, "关联产品不存在");
         }
+
+        // Find the course associated with this product
+        Course course = courseMapper.selectOne(
+                new LambdaQueryWrapper<Course>()
+                        .eq(Course::getProductId, product.getId())
+                        .orderByDesc(Course::getId)
+                        .last("LIMIT 1")
+        );
+
+        if (course == null) {
+            throw new BusinessException(ResultCode.COURSE_NOT_FOUND, "产品关联的课程不存在");
+        }
+
         if (!CourseStatus.PUBLISHED.name().equals(course.getStatus())) {
             throw new BusinessException(ResultCode.COURSE_NOT_PUBLISHED, "课程未发布");
         }
@@ -148,7 +162,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
                                 vo.setTitle(lesson.getTitle());
                                 vo.setItemType(lesson.getItemType());
                                 vo.setIsRequired(lesson.getIsRequired());
-                                vo.setStatus(progress != null ? progress.getStatus() : LessonProgressStatus.LOCKED.name());
+                                // 默认状态为UNLOCKED，如果用户有进度记录则使用实际状态
+                                vo.setStatus(progress != null ? progress.getStatus() : LessonProgressStatus.UNLOCKED.name());
                                 return vo;
                             })
                             .collect(Collectors.toList());
@@ -157,6 +172,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
                     vo.setId(chapter.getId());
                     vo.setTitle(chapter.getTitle());
                     vo.setSortOrder(chapter.getSortOrder());
+                    vo.setLockStatus(chapter.getLockStatus());
                     vo.setLessons(lessonVOs);
                     return vo;
                 })
@@ -164,6 +180,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
         CourseDetailVO vo = new CourseDetailVO();
         vo.setId(course.getId());
+        vo.setProductId(course.getProductId());
         vo.setTitle(course.getTitle());
         vo.setDescription(course.getDescription());
         vo.setStatus(course.getStatus());
@@ -193,20 +210,19 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             throw new BusinessException(ResultCode.COURSE_NOT_ACTIVATED, "课程未激活或已过期");
         }
 
-        // Check if lesson is accessible (unlock logic)
+        // Check if chapter is locked
+        if (ChapterLockStatus.LOCK.name().equals(chapter.getLockStatus())) {
+            throw new BusinessException(ResultCode.LESSON_NOT_ACCESSIBLE, "章节已锁定，无法访问课时");
+        }
+
         UserLessonProgress progress = userLessonProgressMapper.selectOne(
                 new LambdaQueryWrapper<UserLessonProgress>()
                         .eq(UserLessonProgress::getUserId, userId)
                         .eq(UserLessonProgress::getLessonId, lessonId)
         );
 
-        boolean isAccessible = progress != null &&
-                (LessonProgressStatus.UNLOCKED.name().equals(progress.getStatus()) ||
-                        LessonProgressStatus.IN_PROGRESS.name().equals(progress.getStatus()) ||
-                        LessonProgressStatus.COMPLETED.name().equals(progress.getStatus()));
-
-        if (!isAccessible && lesson.getIsRequired()) {
-            // For required lessons, check if previous lesson is completed
+        // For required lessons, check if previous lesson is completed
+        if (lesson.getIsRequired()) {
             List<Lesson> allLessons = lessonMapper.selectList(
                     new LambdaQueryWrapper<Lesson>()
                             .eq(Lesson::getChapterId, lesson.getChapterId())
@@ -248,7 +264,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         vo.setIsRequired(lesson.getIsRequired());
         vo.setContentPayload(contentPayload);
         vo.setSecurityConfig(buildSecurityConfig(lesson.getItemType()));
-        vo.setStatus(progress != null ? progress.getStatus() : LessonProgressStatus.LOCKED.name());
+        vo.setStatus(progress != null ? progress.getStatus() : LessonProgressStatus.UNLOCKED.name());
         vo.setProgressPayload(progress != null ? parseJsonPayload(progress.getProgressPayload()) : new HashMap<String, Object>());
 
         return vo;
@@ -426,6 +442,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         chapter.setCourseId(request.getCourseId());
         chapter.setTitle(request.getTitle());
         chapter.setSortOrder(request.getSortOrder());
+        chapter.setLockStatus(request.getLockStatus() != null ? request.getLockStatus() : ChapterLockStatus.UNLOCK.name());
         chapter.setCreateTime(LocalDateTime.now());
         chapter.setUpdateTime(LocalDateTime.now());
 

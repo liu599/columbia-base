@@ -8,5 +8,6 @@ public class ChapterLessonsVO {
     private Long id;
     private String title;
     private Integer sortOrder;
+    private String lockStatus;
     private List<LessonSimpleVO> lessons;
 }

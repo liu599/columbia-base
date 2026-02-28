@@ -8,4 +8,5 @@ public class AdminChapterSaveRequest {
     private Long courseId;
     private String title;
     private Integer sortOrder;
+    private String lockStatus; // LOCK or UNLOCK
 }

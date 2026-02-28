@@ -17,13 +17,15 @@ public class CourseController {
 
     /**
      * P0: 激活/兑换/购买课程
+     * TODO: 后续会更新成使用 course_id 而不是 product_id
      */
-    @PostMapping("/courses/{course_id}/activate")
+    @PostMapping("/courses/{product_id}/activate")
     public void activateCourse(
-            @PathVariable("course_id") Long courseId,
+            @PathVariable("product_id") Long productId,
             @Valid @RequestBody CourseActivateRequest request,
             HttpServletRequest httpRequest) {
         Long userId = (Long) httpRequest.getAttribute("userId");
+        // TODO: 后续会移除 productId 参数（改为路径参数 course_id）
         courseService.activateCourse(userId, request);
     }
 

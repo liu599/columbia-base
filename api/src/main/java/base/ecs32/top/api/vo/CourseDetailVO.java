@@ -6,6 +6,7 @@ import java.util.List;
 @Data
 public class CourseDetailVO {
     private Long id;
+    private Long productId;
     private String title;
     private String description;
     private String status;

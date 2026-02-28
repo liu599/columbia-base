@@ -20,6 +20,8 @@ public class Chapter {
 
     private Integer sortOrder;
 
+    private String lockStatus;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
