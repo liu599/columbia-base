@@ -1,0 +1,1321 @@
+{
+  "info": {
+    "name": "Columbia Backend API",
+    "description": "后端项目API集合 - 用于向同事介绍项目的所有接口",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "用户认证",
+      "item": [
+        {
+          "name": "用户注册",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@123456\",\n  \"phone\": \"13800138000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "user", "register"]
+            },
+            "description": "注册新用户接口"
+          }
+        },
+        {
+          "name": "用户登录",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test@123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "user", "login"]
+            },
+            "description": "用户登录，返回JWT Token"
+          }
+        },
+        {
+          "name": "用户登出",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "user", "logout"]
+            },
+            "description": "用户登出，注销当前Token"
+          }
+        },
+        {
+          "name": "获取用户信息",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "user", "profile"]
+            },
+            "description": "获取当前登录用户的个人信息"
+          }
+        },
+        {
+          "name": "检查Token有效性",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/check",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "check"]
+            },
+            "description": "验证当前Token是否有效"
+          }
+        },
+        {
+          "name": "用户健康检查",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/user/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "user", "health"]
+            },
+            "description": "用户服务健康检查"
+          }
+        }
+      ]
+    },
+    {
+      "name": "产品管理",
+      "item": [
+        {
+          "name": "产品列表（公开）",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [1, 2, 3]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/product/public/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "product", "public", "list"]
+            },
+            "description": "获取公开的产品列表，包含课程和章节信息"
+          }
+        },
+        {
+          "name": "产品列表（需认证）",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current\": 1,\n  \"pageSize\": 20,\n  \"keyword\": \"\",\n  \"sort\": {\n    \"field\": \"create_time\",\n    \"order\": \"desc\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/product/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "product", "list"]
+            },
+            "description": "分页查询产品列表"
+          }
+        }
+      ]
+    },
+    {
+      "name": "学生课程管理",
+      "item": [
+        {
+          "name": "激活课程",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activationCode\": \"ABCDEF123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/courses/:product_id/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "courses", ":product_id", "activate"],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "激活或兑换课程"
+          }
+        },
+        {
+          "name": "获取课程详情",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/courses/:course_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "courses", ":course_id"],
+              "variable": [
+                {
+                  "key": "course_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "获取课程详情及大纲目录"
+          }
+        },
+        {
+          "name": "获取课时详情",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/lessons/:lesson_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "lessons", ":lesson_id"],
+              "variable": [
+                {
+                  "key": "lesson_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "获取单一课时的详细内容"
+          }
+        },
+        {
+          "name": "更新学习进度",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"watchedPercent\": 50,\n  \"isCompleted\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/lessons/:lesson_id/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "lessons", ":lesson_id", "progress"],
+              "variable": [
+                {
+                  "key": "lesson_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "上报或更新学习进度"
+          }
+        },
+        {
+          "name": "提交作业",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"我的作业内容\",\n  \"attachments\": [\"file_id_1\", \"file_id_2\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/assignments/:lesson_id/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "assignments", ":lesson_id", "submit"],
+              "variable": [
+                {
+                  "key": "lesson_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "提交作业"
+          }
+        },
+        {
+          "name": "我的课程列表",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/my-courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "my-courses"]
+            },
+            "description": "获取我的课程列表（分页）"
+          }
+        },
+        {
+          "name": "查询作业详情",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/student/assignments/:lesson_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "student", "assignments", ":lesson_id"],
+              "variable": [
+                {
+                  "key": "lesson_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "查询某次作业的当前状态、得分及老师评语"
+          }
+        }
+      ]
+    },
+    {
+      "name": "积分管理",
+      "item": [
+        {
+          "name": "查询积分余额",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credit/balance",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "credit", "balance"]
+            },
+            "description": "获取当前用户的积分余额"
+          }
+        },
+        {
+          "name": "积分日志",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current\": 1,\n  \"pageSize\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credit/logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "credit", "logs"]
+            },
+            "description": "查询积分变动日志"
+          }
+        }
+      ]
+    },
+    {
+      "name": "激活码管理",
+      "item": [
+        {
+          "name": "兑换激活码",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"ABCDEF123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/activation/redeem",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "activation", "redeem"]
+            },
+            "description": "兑换激活码获取产品权益"
+          }
+        },
+        {
+          "name": "我的激活产品",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/activation/my-products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "activation", "my-products"]
+            },
+            "description": "查询已激活的产品列表"
+          }
+        }
+      ]
+    },
+    {
+      "name": "文件管理",
+      "item": [
+        {
+          "name": "上传文件",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/file"
+                },
+                {
+                  "key": "userId",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "metadata",
+                  "value": "{\"category\": \"avatar\"}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/file/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "file", "upload"]
+            },
+            "description": "上传文件到OSS"
+          }
+        },
+        {
+          "name": "查询文件",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileUuid\": \"uuid-here\",\n  \"userId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/file/get",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "file", "get"]
+            },
+            "description": "根据UUID或用户ID查询文件信息"
+          }
+        },
+        {
+          "name": "更新文件元数据",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileUuid\": \"uuid-here\",\n  \"userId\": 1,\n  \"metadata\": \"{\\\"category\\\": \\\"updated\\\"}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/file/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "file", "update"]
+            },
+            "description": "更新文件的元数据"
+          }
+        },
+        {
+          "name": "删除文件",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileUuid\": \"uuid-here\",\n  \"userId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/file/delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "file", "delete"]
+            },
+            "description": "软删除文件"
+          }
+        }
+      ]
+    },
+    {
+      "name": "微信认证",
+      "item": [
+        {
+          "name": "获取微信二维码",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wechat/qrcode",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "wechat", "qrcode"]
+            },
+            "description": "获取微信登录二维码"
+          }
+        },
+        {
+          "name": "微信登录",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sceneId\": \"ABCDEF\",\n  \"loginCode\": \"wechat_login_code\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wechat/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "wechat", "login"]
+            },
+            "description": "使用微信扫码登录"
+          }
+        },
+        {
+          "name": "刷新访问令牌",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wechat/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "wechat", "refresh-token"]
+            },
+            "description": "刷新微信访问令牌"
+          }
+        }
+      ]
+    },
+    {
+      "name": "管理员",
+      "item": [
+        {
+          "name": "用户管理",
+          "item": [
+            {
+              "name": "用户列表",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current\": 1,\n  \"pageSize\": 20,\n  \"keyword\": \"\",\n  \"filters\": {},\n  \"sort\": {\n    \"field\": \"create_time\",\n    \"order\": \"desc\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/user/list",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "user", "list"]
+                },
+                "description": "分页查询用户列表（需要管理员权限）"
+              }
+            },
+            {
+              "name": "修改用户状态",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetUserId\": 1,\n  \"status\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/user/status",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "user", "status"]
+                },
+                "description": "启用或禁用用户（需要管理员权限）"
+              }
+            }
+          ]
+        },
+        {
+          "name": "产品管理",
+          "item": [
+            {
+              "name": "保存产品",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"name\": \"示例产品\",\n  \"description\": \"产品描述\",\n  \"baseCredits\": 100,\n  \"cover\": \"cover_url\",\n  \"status\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/product/save",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "product", "save"]
+                },
+                "description": "创建或更新产品"
+              }
+            },
+            {
+              "name": "手动激活产品",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetUserId\": 1,\n  \"productId\": 1,\n  \"remark\": \"手动激活原因\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/product/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "product", "activate"]
+                },
+                "description": "管理员手动激活用户产品"
+              }
+            },
+            {
+              "name": "产品课程树形结构",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": 1,\n  \"courses\": [\n    {\n      \"id\": null,\n      \"title\": \"课程1\",\n      \"description\": \"课程描述\",\n      \"status\": \"PUBLISHED\",\n      \"chapters\": [\n        {\n          \"id\": null,\n          \"title\": \"章节1\",\n          \"sortOrder\": 1,\n          \"lessons\": [\n            {\n              \"id\": null,\n              \"title\": \"课时1\",\n              \"itemType\": \"VIDEO\",\n              \"isRequired\": true,\n              \"sortOrder\": 1,\n              \"contentPayload\": \"{\\\"url\\\": \\\"video_url\\\"}\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/product/tree",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "product", "tree"]
+                },
+                "description": "创建或更新整个产品-课程-章节-课时树形结构"
+              }
+            },
+            {
+              "name": "查询产品课程树",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": 1,\n  \"detailLevel\": \"BASIC\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/product/courses/query",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "product", "courses", "query"]
+                },
+                "description": "根据产品ID查询关联的课程树形结构"
+              }
+            }
+          ]
+        },
+        {
+          "name": "课程管理",
+          "item": [
+            {
+              "name": "保存课程",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"title\": \"示例课程\",\n  \"description\": \"课程描述\",\n  \"status\": \"DRAFT\",\n  \"productId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/courses",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "courses"]
+                },
+                "description": "创建或更新课程基础元数据"
+              }
+            },
+            {
+              "name": "保存章节",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"courseId\": 1,\n  \"title\": \"示例章节\",\n  \"sortOrder\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/chapters",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "chapters"]
+                },
+                "description": "创建或更新章节"
+              }
+            },
+            {
+              "name": "保存课时",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": null,\n  \"chapterId\": 1,\n  \"title\": \"示例课时\",\n  \"itemType\": \"VIDEO\",\n  \"isRequired\": true,\n  \"sortOrder\": 1,\n  \"contentPayload\": \"{\\\"url\\\": \\\"video_url\\\"}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/lessons",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "lessons"]
+                },
+                "description": "创建或更新课时内容"
+              }
+            },
+            {
+              "name": "获取课时详情",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/lessons/get",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "lessons", "get"]
+                },
+                "description": "根据ID获取课时详情"
+              }
+            },
+            {
+              "name": "作业列表",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current\": 1,\n  \"pageSize\": 20,\n  \"status\": \"SUBMITTED\",\n  courseId: 1,\n  lessonId: 1,\n  userId: 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/assignments",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "assignments"]
+                },
+                "description": "分页获取待批改或所有状态的作业列表"
+              }
+            },
+            {
+              "name": "批改作业",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"score\": 90,\n  \"feedback\": \"作业评语\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/assignments/:assignment_id/grade",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "assignments", ":assignment_id", "grade"],
+                  "variable": [
+                    {
+                      "key": "assignment_id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "批改学生作业"
+              }
+            },
+            {
+              "name": "查看用户课程",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/users/:user_id/courses",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "users", ":user_id", "courses"],
+                  "variable": [
+                    {
+                      "key": "user_id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "查看某位学生的拥有的课程及详细进度"
+              }
+            },
+            {
+              "name": "管理用户课程权限",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"ACTIVATE\",\n  \"remark\": \"管理员操作原因\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/users/:user_id/courses/:course_id/access",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "users", ":user_id", "courses", ":course_id", "access"],
+                  "variable": [
+                    {
+                      "key": "user_id",
+                      "value": "1"
+                    },
+                    {
+                      "key": "course_id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "人工干预学生的课程权限"
+              }
+            }
+          ]
+        },
+        {
+          "name": "激活码管理",
+          "item": [
+            {
+              "name": "批量创建激活码",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": 1,\n  \"count\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/activation/batch-create",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "activation", "batch-create"]
+                },
+                "description": "批量创建产品激活码"
+              }
+            },
+            {
+              "name": "查询用户激活状态",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetUserId\": 1,\n  \"productId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/activation/check-user",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "activation", "check-user"]
+                },
+                "description": "查询用户对某个产品的激活状态"
+              }
+            },
+            {
+              "name": "停用用户产品",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetUserId\": 1,\n  \"productId\": 1,\n  \"remark\": \"停用原因\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/activation/deactivate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "activation", "deactivate"]
+                },
+                "description": "停用用户已激活的产品"
+              }
+            },
+            {
+              "name": "激活码列表",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current\": 1,\n  \"pageSize\": 20,\n  \"filters\": {\n    \"status\": 0\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/activation/list",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "activation", "list"]
+                },
+                "description": "分页查询激活码列表"
+              }
+            }
+          ]
+        },
+        {
+          "name": "积分管理",
+          "item": [
+            {
+              "name": "手动充值",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetUserId\": 1,\n  \"amount\": 100,\n  \"reason\": \"管理员手动充值\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/credit/recharge",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "credit", "recharge"]
+                },
+                "description": "管理员手动给用户充值积分"
+              }
+            }
+          ]
+        },
+        {
+          "name": "审计日志",
+          "item": [
+            {
+              "name": "审计日志列表",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"current\": 1,\n  \"pageSize\": 20,\n  \"keyword\": \"\",\n  \"filters\": {},\n  \"sort\": {\n    \"field\": \"create_time\",\n    \"order\": \"desc\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/audit/list",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "audit", "list"]
+                },
+                "description": "查询管理员操作审计日志"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your-jwt-token-here",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "your-admin-jwt-token-here",
+      "type": "string"
+    }
+  ]
+}
