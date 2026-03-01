@@ -5,6 +5,7 @@ import base.ecs32.top.api.dto.ProductListRequest;
 import base.ecs32.top.api.dto.SearchRequest;
 import base.ecs32.top.api.service.ProductService;
 import base.ecs32.top.api.vo.PageResponse;
+import base.ecs32.top.api.vo.ProductVO;
 import base.ecs32.top.api.vo.PublicProductVO;
 import base.ecs32.top.entity.Product;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class ProductController {
  private final ProductService productService;
 
  @PostMapping("/list")
- public PageResponse<Product> listProducts(@RequestBody SearchRequest request) {
+ public PageResponse<ProductVO> listProducts(@RequestBody SearchRequest request) {
  return productService.listProducts(request);
  }
 

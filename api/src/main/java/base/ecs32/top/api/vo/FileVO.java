@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileVO {
+    private Long fileId;         // 数据库主键（雪花 ID）
     private String fileUuid;
     private String fileName;
     private String signedUrl;    // 动态生成的签名 URL

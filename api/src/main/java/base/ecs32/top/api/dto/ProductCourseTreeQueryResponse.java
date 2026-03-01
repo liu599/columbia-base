@@ -36,6 +36,11 @@ public class ProductCourseTreeQueryResponse {
     private Integer productStatus;
 
     /**
+     * 产品封面图文件 ID
+     */
+    private Long productCover;
+
+    /**
      * 课程列表（数组结构，支持单个或多个课程）
      */
     private List<CourseTree> courses;
@@ -56,6 +61,7 @@ public class ProductCourseTreeQueryResponse {
         private String description;
         private String status;
         private Long productId;
+        private Long cover;
 
         // 仅 FULL 层级返回
         private Map<String, Object> contentPayload;

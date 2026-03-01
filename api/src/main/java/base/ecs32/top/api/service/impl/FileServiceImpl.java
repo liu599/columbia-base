@@ -154,6 +154,7 @@ public class FileServiceImpl implements FileService {
         String fileName = fileEntity.getOssPath().substring(fileEntity.getOssPath().lastIndexOf("/") + 1);
 
         return FileVO.builder()
+                .fileId(fileEntity.getId())
                 .fileUuid(fileEntity.getFileUuid())
                 .fileName(fileName)
                 .signedUrl(signedUrl)

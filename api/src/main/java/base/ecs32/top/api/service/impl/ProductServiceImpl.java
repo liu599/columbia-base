@@ -13,6 +13,7 @@ import base.ecs32.top.api.service.ProductService;
 import base.ecs32.top.api.util.QueryWrapperUtils;
 import base.ecs32.top.api.util.OssUtils;
 import base.ecs32.top.api.vo.PageResponse;
+import base.ecs32.top.api.vo.ProductVO;
 import base.ecs32.top.api.vo.PublicProductVO;
 import base.ecs32.top.dao.ChapterMapper;
 import base.ecs32.top.dao.CourseMapper;
@@ -54,11 +55,26 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
  private static final long COVER_URL_EXPIRATION = 3600; // 1 hour for cover images
 
  @Override
- public PageResponse<Product> listProducts(SearchRequest request) {
+ public PageResponse<ProductVO> listProducts(SearchRequest request) {
  Page<Product> page = new Page<>(request.getCurrent(), request.getPageSize());
  QueryWrapper<Product> wrapper = QueryWrapperUtils.buildWrapper(request, Arrays.asList("name", "description"));
  productMapper.selectPage(page, wrapper);
- return PageResponse.of(page.getRecords(), page.getTotal(), (int)page.getCurrent(), (int)page.getSize());
+
+ // 转换为 ProductVO 并填充 coverUrl
+ List<ProductVO> productVOList = page.getRecords().stream().map(product -> {
+ ProductVO vo = ProductVO.builder()
+ .id(product.getId())
+ .name(product.getName())
+ .description(product.getDescription())
+ .baseCredits(product.getBaseCredits())
+ .status(product.getStatus())
+ .cover(product.getCover())
+ .coverUrl(generateCoverUrl(product.getCover())) // 填充临时 URL
+ .build();
+ return vo;
+ }).collect(Collectors.toList());
+
+ return PageResponse.of(productVOList, page.getTotal(), (int)page.getCurrent(), (int)page.getSize());
  }
 
  @Override
@@ -540,6 +556,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
  response.setProductDescription(product.getDescription());
  response.setProductBaseCredits(product.getBaseCredits());
  response.setProductStatus(product.getStatus());
+ response.setProductCover(product.getCover());
  response.setTreeLevel(request.getTreeLevel().name());
 
  if (request.getCourseId() != null) {
@@ -576,6 +593,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
  if (treeLevel != ProductCourseTreeQueryRequest.TreeLevel.TITLES_ONLY) {
  courseTree.setDescription(course.getDescription());
  courseTree.setStatus(course.getStatus());
+ courseTree.setCover(course.getCover());
  }
 
  // 获取章节

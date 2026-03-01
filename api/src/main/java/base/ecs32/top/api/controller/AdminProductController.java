@@ -59,6 +59,7 @@ public class AdminProductController {
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setBaseCredits(request.getBaseCredits());
+        product.setCover(request.getCover());
         product.setStatus(request.getStatus());
 
         productService.saveOrUpdate(product);
