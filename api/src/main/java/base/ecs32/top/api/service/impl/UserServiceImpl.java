@@ -63,27 +63,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   @Transactional(rollbackFor = Exception.class)
   public UserRegisterVO register(UserRegisterRequest request) {
-    // Validate phone number format
-    if (!PHONE_PATTERN.matcher(request.getPhone()).matches()) {
-      throw new BusinessException(ResultCode.PHONE_FORMAT_NOT_VALID, "手机号格式不正确");
+    // TODO: 暂时不校验密码强度，只要求至少6位
+    // // Validate password strength
+    // if (!PasswordUtils.isStrongPassword(request.getPassword())) {
+    //   throw new BusinessException(ResultCode.PASSWORD_NOT_VALID, "密码强度不合格：必须包含 1 个大写字母、1 个小写字母、1 个特殊字符，且长度大于 8 位");
+    // }
+
+    // Validate password length (minimum 6 characters)
+    if (request.getPassword() == null || request.getPassword().length() < 6) {
+      throw new BusinessException(ResultCode.PASSWORD_NOT_VALID, "密码长度至少6位");
     }
 
     // Extract wechatOpenid from temporary token if present
     String wechatOpenid = extractWechatOpenidFromToken(request.getTempToken());
 
-    // Validate password strength
-    if (!PasswordUtils.isStrongPassword(request.getPassword())) {
-      throw new BusinessException(ResultCode.PASSWORD_NOT_VALID, "密码强度不合格：必须包含 1 个大写字母、1 个小写字母、1 个特殊字符，且长度大于 8 位");
-    }
+    // TODO: 暂时不校验手机号格式，只允许手机号为空
+    // // Validate phone number format
+    // if (!PHONE_PATTERN.matcher(request.getPhone()).matches()) {
+    //   throw new BusinessException(ResultCode.PHONE_FORMAT_NOT_VALID, "手机号格式不正确");
+    // }
 
     // Check if username already exists
     if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())) != null) {
       throw new BusinessException(ResultCode.USERNAME_ALREADY_EXISTS, "用户名已存在");
     }
 
-    // Check if phone number already exists
-    if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, request.getPhone())) != null) {
-      throw new BusinessException(ResultCode.PHONE_ALREADY_EXISTS, "手机号已存在");
+    // Check if phone number already exists (only if phone is provided)
+    if (request.getPhone() != null && !request.getPhone().isEmpty()) {
+      // Validate phone format only if provided
+      if (!PHONE_PATTERN.matcher(request.getPhone()).matches()) {
+        throw new BusinessException(ResultCode.PHONE_FORMAT_NOT_VALID, "手机号格式不正确");
+      }
+      // Check phone uniqueness
+      if (userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, request.getPhone())) != null) {
+        throw new BusinessException(ResultCode.PHONE_ALREADY_EXISTS, "手机号已存在");
+      }
     }
 
     User user = new User();
