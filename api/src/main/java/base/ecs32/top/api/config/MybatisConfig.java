@@ -43,6 +43,8 @@ public class MybatisConfig {
         bean.setDataSource(dataSource);
 
         com.baomidou.mybatisplus.core.MybatisConfiguration configuration = new com.baomidou.mybatisplus.core.MybatisConfiguration();
+        // Keep logging for base datasource (primary)
+        configuration.setLogImpl(org.apache.ibatis.logging.stdout.StdOutImpl.class);
         bean.setConfiguration(configuration);
         return bean.getObject();
     }

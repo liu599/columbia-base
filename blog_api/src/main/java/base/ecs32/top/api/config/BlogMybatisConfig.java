@@ -31,8 +31,9 @@ public class BlogMybatisConfig {
     MybatisSqlSessionFactoryBean bean = new MybatisSqlSessionFactoryBean();
     bean.setDataSource(dataSource);
 
-    // 设置 MyBatis-Plus 配置
+    // 设置 MyBatis-Plus 配置 - disable logging to avoid duplication with base datasource
     com.baomidou.mybatisplus.core.MybatisConfiguration configuration = new com.baomidou.mybatisplus.core.MybatisConfiguration();
+    configuration.setLogImpl(org.apache.ibatis.logging.nologging.NoLoggingImpl.class);
     bean.setConfiguration(configuration);
     return bean.getObject();
   }
