@@ -33,8 +33,6 @@ public class BlogMybatisConfig {
 
     // 设置 MyBatis-Plus 配置
     com.baomidou.mybatisplus.core.MybatisConfiguration configuration = new com.baomidou.mybatisplus.core.MybatisConfiguration();
-    configuration.setLogImpl(org.apache.ibatis.logging.stdout.StdOutImpl.class);
-
     bean.setConfiguration(configuration);
     return bean.getObject();
   }

@@ -221,39 +221,15 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
                         .eq(UserLessonProgress::getLessonId, lessonId)
         );
 
-        // For required lessons, check if previous lesson is completed
-        if (lesson.getIsRequired()) {
-            List<Lesson> allLessons = lessonMapper.selectList(
-                    new LambdaQueryWrapper<Lesson>()
-                            .eq(Lesson::getChapterId, lesson.getChapterId())
-                            .orderByAsc(Lesson::getSortOrder)
-            );
-
-            int currentIndex = -1;
-            for (int i = 0; i < allLessons.size(); i++) {
-                if (allLessons.get(i).getId().equals(lessonId)) {
-                    currentIndex = i;
-                    break;
-                }
-            }
-
-            if (currentIndex > 0) {
-                Lesson previousLesson = allLessons.get(currentIndex - 1);
-                UserLessonProgress prevProgress = userLessonProgressMapper.selectOne(
-                        new LambdaQueryWrapper<UserLessonProgress>()
-                                .eq(UserLessonProgress::getUserId, userId)
-                                .eq(UserLessonProgress::getLessonId, previousLesson.getId())
-                );
-
-                if (prevProgress == null || !LessonProgressStatus.COMPLETED.name().equals(prevProgress.getStatus())) {
-                    throw new BusinessException(ResultCode.LESSON_NOT_ACCESSIBLE, "请先完成上一课时");
-                }
-            }
-        }
-
         // Get content payload and generate presigned URLs
         Map<String, Object> contentPayload = parseJsonPayload(lesson.getContentPayload());
         contentPayload = generatePresignedUrls(contentPayload);
+
+        // Generate assetsMapping and embed it in contentPayload
+        Map<String, String> assetsMapping = generateAssetMapping(contentPayload);
+        if (!assetsMapping.isEmpty()) {
+            contentPayload.put("assetsMapping", assetsMapping);
+        }
 
         LessonDetailVO vo = new LessonDetailVO();
         vo.setId(lesson.getId());
